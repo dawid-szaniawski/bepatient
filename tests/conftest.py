@@ -55,7 +55,7 @@ def session_mock(
 @pytest.fixture(scope="session")
 def checker() -> Checker:
     class CheckerMocker(Checker):
-        def __str__(self):
+        def __str__(self) -> str:
             return "The truth"
 
         def check(self, data: Any) -> bool:
