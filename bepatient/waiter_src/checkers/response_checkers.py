@@ -45,7 +45,6 @@ class ResponseChecker(Checker):
 
         Returns:
             Any: Data for comparison."""
-        ...
 
     def check(self, data: Response) -> bool:
         """Checks if the value in the JSON response satisfies the condition.
@@ -135,7 +134,6 @@ class DictResponseChecker(ResponseChecker):
 
         Returns:
             dict[str, Any] | list[Any]: The parsed response data for comparison."""
-        ...
 
     def prepare_data(
         self, data: Response, run_uuid: str | None = None

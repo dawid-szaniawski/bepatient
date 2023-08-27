@@ -7,7 +7,7 @@ class Checker(ABC):
 
     @abstractmethod
     def __str__(self) -> str:
-        ...
+        """Textual representation of the Checker object for logging"""
 
     @abstractmethod
     def check(self, data: Any) -> bool:
@@ -18,4 +18,3 @@ class Checker(ABC):
 
         Returns:
             bool: True if the condition is met, False otherwise."""
-        ...

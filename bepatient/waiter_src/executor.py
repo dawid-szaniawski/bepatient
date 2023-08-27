@@ -11,14 +11,11 @@ class Executor(ABC):
 
         Returns:
             bool: True if the condition has been met, False otherwise."""
-        ...
 
     @abstractmethod
     def get_result(self) -> Any:
         """Returns the result of performed actions."""
-        ...
 
     @abstractmethod
     def error_message(self) -> str:
         """Return a detailed error message if the condition has not been met."""
-        ...

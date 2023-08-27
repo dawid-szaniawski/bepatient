@@ -9,7 +9,7 @@ from bepatient.waiter_src.executors.requests_executor import RequestsExecutor
 
 class TestRequestExecutor:
     def test_executor_returns_true_for_expected_status_code(
-        self, mocker: MockerFixture, session_mock: Session
+        self, mocker: MockerFixture
     ):
         request = mocker.MagicMock()
         session = mocker.MagicMock()
@@ -116,7 +116,7 @@ class TestRequestExecutor:
         self,
         mocker: MockerFixture,
         session_mock: Session,
-        response: Response,
+        dict_content_response: Response,
         checker: Checker,
     ):
         request = mocker.MagicMock()
@@ -127,7 +127,7 @@ class TestRequestExecutor:
         executor.is_condition_met()
         result = executor.get_result()
 
-        assert result == response
+        assert result == dict_content_response
 
     def test_error_message_returns_correct_message_status_checker(
         self, prepared_request: PreparedRequest, mocker: MockerFixture, checker: Checker
@@ -137,7 +137,10 @@ class TestRequestExecutor:
         response = Response()
         response.status_code = 404
         response.url = "https://webludus.pl"
-        response._content = b'{"error": "not found"}'
+        # fmt: off
+        response._content = b'{"error": "not found"}'  \
+            # pylint: disable=protected-access
+        # fmt: on
         session.send.return_value = response
         executor = RequestsExecutor(
             req_or_res=request, session=session, expected_status_code=200
@@ -164,7 +167,10 @@ class TestRequestExecutor:
         response = Response()
         response.status_code = 200
         response.url = "https://webludus.pl"
-        response._content = b'{"error": "not found"}'
+        # fmt: off
+        response._content = b'{"error": "not found"}' \
+            # pylint: disable=protected-access
+        # fmt: on
         session.send.return_value = response
         executor = RequestsExecutor(
             req_or_res=request, session=session, expected_status_code=200
@@ -216,41 +222,45 @@ class TestRequestExecutor:
         assert isinstance(executor.session, Session)
 
     def test_response_headers_merged_into_session(
-        self, response: Response, prepared_request: PreparedRequest
+        self, dict_content_response: Response, prepared_request: PreparedRequest
     ):
-        response.request = prepared_request
+        dict_content_response.request = prepared_request
         session = Session()
         session.headers = {"test_name": "test_response_headers_merged_into_session"}
         expected_headers = session.headers | dict(prepared_request.headers)
 
         executor = RequestsExecutor(
-            req_or_res=response, expected_status_code=200, session=session
+            req_or_res=dict_content_response, expected_status_code=200, session=session
         )
 
         assert executor.session.headers == expected_headers
 
     def test_self_request_is_first_response_request(
-        self, response: Response, prepared_request: PreparedRequest
+        self, dict_content_response: Response, prepared_request: PreparedRequest
     ):
-        response.request = prepared_request
+        dict_content_response.request = prepared_request
 
-        executor = RequestsExecutor(req_or_res=response, expected_status_code=200)
+        executor = RequestsExecutor(
+            req_or_res=dict_content_response, expected_status_code=200
+        )
 
         assert executor.request == prepared_request
 
     def test_self_request_is_first_request_from_history(
         self,
-        response: Response,
+        dict_content_response: Response,
         headers_response: Response,
         prepared_request: PreparedRequest,
     ):
         additional_response = Response()
         additional_response.request = prepared_request
-        response.history = [additional_response, headers_response]
+        dict_content_response.history = [additional_response, headers_response]
 
-        response.request = PreparedRequest()
-        response.request.prepare_headers({})
+        dict_content_response.request = PreparedRequest()
+        dict_content_response.request.prepare_headers({})
 
-        executor = RequestsExecutor(req_or_res=response, expected_status_code=200)
+        executor = RequestsExecutor(
+            req_or_res=dict_content_response, expected_status_code=200
+        )
 
         assert executor.request == prepared_request
