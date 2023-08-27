@@ -2,7 +2,6 @@ from json import JSONDecodeError
 from typing import Any, Callable
 
 from _pytest.logging import LogCaptureFixture
-from pytest import fixture
 from pytest_mock import MockerFixture
 from requests import Response
 
@@ -10,20 +9,22 @@ from bepatient.waiter_src.checkers.response_checkers import HeadersChecker, Json
 
 
 class TestJsonChecker:
-    def test_dict(self, response: Response, is_equal: Callable[[Any, Any], bool]):
+    def test_dict(
+        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
+    ):
         checker = JsonChecker(is_equal, True, dict_path="ok")
-        assert checker.check(response) is True
+        assert checker.check(dict_content_response) is True
 
-    def test_list(self, response: Response):
+    def test_list(self, dict_content_response: Response):
         checker = JsonChecker(lambda a, b: b in a, "2", dict_path="list")
-        assert checker.check(response) is True
+        assert checker.check(dict_content_response) is True
 
-    def test_longer_dict_path(self, response: Response):
+    def test_longer_dict_path(self, dict_content_response: Response):
         checker = JsonChecker(lambda a, b: a < b, 18, dict_path="list_of_dicts.1.age")
-        assert checker.check(response) is True
+        assert checker.check(dict_content_response) is True
 
     def test_search_query(
-        self, response: Response, is_equal: Callable[[Any, Any], bool]
+        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
     ):
         checker = JsonChecker(
             comparer=is_equal,
@@ -31,25 +32,25 @@ class TestJsonChecker:
             dict_path="list_of_dicts",
             search_query="name",
         )
-        assert checker.check(response) is True
+        assert checker.check(dict_content_response) is True
 
-    def test_condition_not_met(self, response: Response):
+    def test_condition_not_met(self, dict_content_response: Response):
         checker = JsonChecker(
             lambda a, b: b in a, "Joe", dict_path="list_of_dicts", search_query="name"
         )
-        assert checker.check(response) is False
+        assert checker.check(dict_content_response) is False
 
     def test_missing_key(
-        self, response: Response, is_equal: Callable[[Any, Any], bool]
+        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
     ):
         checker = JsonChecker(is_equal, "TEST", dict_path="status")
-        assert checker.check(response) is False
+        assert checker.check(dict_content_response) is False
 
     def test_missing_in_search_query(
-        self, response: Response, is_equal: Callable[[Any, Any], bool]
+        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
     ):
         checker = JsonChecker(is_equal, "TEST", search_query="name")
-        assert checker.check(response) is False
+        assert checker.check(dict_content_response) is False
 
     def test_prepare_data_catch_json_decode_error(
         self,
@@ -106,8 +107,3 @@ class TestHeadersChecker:
     ):
         checker = HeadersChecker(is_equal, "TEST", search_query="name")
         assert checker.check(headers_response) is False
-
-
-@fixture
-def is_equal() -> Callable[[Any, Any], bool]:
-    return lambda a, b: a == b

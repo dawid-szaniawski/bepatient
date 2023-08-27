@@ -14,10 +14,7 @@ class Curler:
     @staticmethod
     def _prepare_headers(data: dict[str, Any] | CaseInsensitiveDict[str]) -> str:
         headers = " ".join(
-            (
-                f"-H {quote('{0}: {1}'.format(name, value))}"
-                for name, value in data.items()
-            )
+            (f"-H {quote(f'{name}: {value}')}" for name, value in data.items())
         )
         return f" {headers}" if len(headers) > 0 else ""
 

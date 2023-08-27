@@ -14,7 +14,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox
       - name: Run linters with Tox
-        run: tox -e ruff,mypy,flake8
+        run: tox -e flake8,mypy,pylint,ruff
   Tests:
     runs-on: ${{ matrix.os }}
     strategy:

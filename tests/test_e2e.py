@@ -25,7 +25,7 @@ class TestWaitForValueInRequest:
             "This ability functions identically to shell armor."
         )
         response = wait_for_value_in_request(
-            request=get("https://pokeapi.co/api/v2/ability/battle-armor"),
+            request=get("https://pokeapi.co/api/v2/ability/battle-armor", timeout=5),
             comparer="contain_all",
             expected_value=(msg,),
             checker="json_checker",
@@ -58,7 +58,7 @@ class TestWaitForValuesInRequest:
             },
         ]
         response = wait_for_values_in_request(
-            request=get("https://pokeapi.co/api/v2/ability/battle-armor"),
+            request=get("https://pokeapi.co/api/v2/ability/battle-armor", timeout=5),
             checkers=list_of_checkers,  # type: ignore
             retries=5,
         )
@@ -74,7 +74,7 @@ class TestRequestsWaiter:
         )
 
         waiter = RequestsWaiter(
-            request=get("https://pokeapi.co/api/v2/ability/battle-armor")
+            request=get("https://pokeapi.co/api/v2/ability/battle-armor", timeout=5)
         )
         waiter.add_checker(
             comparer="contain_all",
@@ -96,7 +96,9 @@ class TestRequestsWaiter:
         )
         response = (
             RequestsWaiter(
-                request=get("https://pokeapi.co/api/v2/ability/battle-armor"),
+                request=get(
+                    "https://pokeapi.co/api/v2/ability/battle-armor", timeout=5
+                ),
             )
             .add_checker(
                 expected_value=(msg,),
