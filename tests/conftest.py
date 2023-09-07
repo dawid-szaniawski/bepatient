@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Callable
 
 import pytest
 from pytest_mock import MockerFixture
@@ -15,9 +15,11 @@ def dict_content_response() -> Response:
         "list_of_dicts": [{"name": "John", "age": 30}, {"name": "Mike", "age": 15}],
         "ok": True,
         "list": ["1", "2", "3"],
+        "none": None,
     }
     res = Response()
     res.status_code = 200
+    res.headers = CaseInsensitiveDict(content="json")
     res._content = json.dumps(data).encode("utf-8")  # pylint: disable=protected-access
     return res
 
@@ -53,7 +55,7 @@ def session_mock(
 
 
 @pytest.fixture(scope="session")
-def checker() -> Checker:
+def checker_true() -> Checker:
     class CheckerMocker(Checker):
         def __str__(self) -> str:
             return "The truth"
@@ -74,3 +76,22 @@ def checker_false() -> Checker:
             return False
 
     return CheckerMocker()
+
+
+@pytest.fixture
+def is_equal() -> Callable[[Any, Any], bool]:
+    def comparer(data: Any, expected_value: Any) -> bool:
+        return data == expected_value
+
+    return comparer
+
+
+@pytest.fixture(scope="session")
+def error_msg() -> str:
+    return (
+        "The condition has not been met! | Failed checkers: (Checker:"
+        " JsonChecker | Comparer: is_equal | Dictor_fallback: None"
+        " | Expected_value: False | Path: ok | Search_query: None | Data: True)"
+        " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
+        " https://webludus.pl/"
+    )

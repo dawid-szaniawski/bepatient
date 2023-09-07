@@ -33,10 +33,11 @@ class RequestsExecutor(Executor):
         if session:
             self.session = session
         else:
-            log.info("Creating new Session object")
+            log.info("Creating a new Session object")
             self.session = Session()
 
         if isinstance(req_or_res, Response):
+            log.info("Merging response data into session")
             self.session.headers.update(req_or_res.request.headers)
             self._response = req_or_res
             if len(req_or_res.history) > 0:
