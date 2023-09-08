@@ -88,12 +88,13 @@ class RequestsWaiter:
         )
         return self
 
-    def run(self, retries: int = 60, delay: int = 1):
+    def run(self, retries: int = 60, delay: int = 1, raise_error: bool = True):
         """Run the waiter and monitor the specified request or response.
 
         Args:
             retries (int, optional): The number of retries to perform. Defaults to 60.
             delay (int, optional): The delay between retries in seconds. Defaults to 1.
+            raise_error (bool): raises WaiterConditionWasNotMet.
 
         Returns:
             self: updated RequestsWaiter instance.
@@ -101,7 +102,12 @@ class RequestsWaiter:
         Raises:
             WaiterConditionWasNotMet: if the condition is not met within the specified
                 number of attempts."""
-        wait_for_executor(executor=self.executor, retries=retries, delay=delay)
+        wait_for_executor(
+            executor=self.executor,
+            retries=retries,
+            delay=delay,
+            raise_error=raise_error,
+        )
         return self
 
     def get_result(self) -> Response:

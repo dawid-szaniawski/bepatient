@@ -153,6 +153,7 @@ Run the waiter and monitor the specified request or response.
 ###### Args:
 - retries `(int, optional)`: The number of retries to perform. Defaults to `60`.
 - delay `(int, optional)`: The delay between retries in seconds. Defaults to `1`.
+- raise_error `(bool, optional)`: raises WaiterConditionWasNotMet. Defaults to `True`.
 
 ###### Returns:
 - `self`: updated `RequestsWaiter` instance.

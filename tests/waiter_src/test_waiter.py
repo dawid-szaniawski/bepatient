@@ -25,3 +25,12 @@ class TestWaiter:
             wait_for_executor(mock_executor, retries=3, delay=0)
 
         assert mock_executor.is_condition_met.call_count == 3
+
+    def test_do_not_raise_error(self, mocker: MockerFixture):
+        mock_executor = mocker.MagicMock(spec=Executor)
+        mock_executor.is_condition_met.return_value = False
+        mock_executor.error_message.return_value = "error message"
+
+        wait_for_executor(executor=mock_executor, retries=3, delay=0, raise_error=False)
+
+        assert mock_executor.is_condition_met.call_count == 3

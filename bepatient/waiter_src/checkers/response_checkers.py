@@ -1,8 +1,8 @@
 import logging
+import uuid
 from abc import abstractmethod
 from json import JSONDecodeError
 from typing import Any, Callable
-from uuid import uuid4
 
 from dictor import dictor
 from requests import Response
@@ -55,7 +55,7 @@ class ResponseChecker(Checker):
         Returns:
             bool: True if the value in the JSON response satisfies the condition,
                 False otherwise."""
-        run_uuid = str(uuid4())
+        run_uuid = str(uuid.uuid4())
         log.info("Check uuid: %s | %s", run_uuid, self)
 
         try:
