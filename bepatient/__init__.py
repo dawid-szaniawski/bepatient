@@ -11,7 +11,7 @@ from .api import (
 from .waiter_src.checkers import CHECKERS
 from .waiter_src.comparators import COMPARATORS
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __all__ = [
     "to_curl",
     "wait_for_values_in_request",
