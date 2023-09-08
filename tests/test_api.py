@@ -1,11 +1,11 @@
 import pytest
-from requests import PreparedRequest, Session, Response
+from requests import PreparedRequest, Response, Session
 
 from bepatient import (
     RequestsWaiter,
+    to_curl,
     wait_for_value_in_request,
     wait_for_values_in_request,
-    to_curl,
 )
 from bepatient.waiter_src.checkers.response_checkers import HeadersChecker
 from bepatient.waiter_src.comparators import is_equal
