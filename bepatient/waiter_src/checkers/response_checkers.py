@@ -95,8 +95,8 @@ class StatusCodeChecker(ResponseChecker):
         return status_code
 
 
-class DictResponseChecker(ResponseChecker):
-    """A checker that compares a value in a response against an expected value.
+class JsonChecker(ResponseChecker):
+    """A checker that compares a value in a JSON response against an expected value.
 
     Args:
         comparer (Callable): A function that performs the comparison.
@@ -106,7 +106,15 @@ class DictResponseChecker(ResponseChecker):
         search_query (str, optional): A search query to find the value in the response
             data. Defaults to None.
         dictor_fallback (str, optional): A default value to return if the value at the
-            specified path is not found using `dictor`. Defaults to None."""
+            specified path is not found using `dictor`. Defaults to None.
+
+    Example:
+        To check if a specific field "status" in a JSON response equals 200:
+
+        ```
+            checker = JsonChecker(lambda a, b: a == b, 200, dict_path="status")
+            assert checker.check(response) is True
+        ```"""
 
     def __init__(
         self,
@@ -122,18 +130,19 @@ class DictResponseChecker(ResponseChecker):
         super().__init__(comparer, expected_value)
 
     @staticmethod
-    @abstractmethod
     def parse_response(
         data: Response, run_uuid: str | None = None
     ) -> dict[str, Any] | list[Any]:
-        """Parse the response data into a dictionary or a list for comparison.
+        """Parse the response content as JSON for comparison.
 
         Args:
-            data (Response): response containing the data.
-            run_uuid (str | None): The unique run identifier. Defaults to None.
+            data (Response): response containing the JSON data.
+            run_uuid (str | None): unique run identifier. Defaults to None.
 
         Returns:
-            dict[str, Any] | list[Any]: The parsed response data for comparison."""
+            dict[str, Any] | list[Any]: The parsed JSON response data for comparison."""
+        log.info("Check uuid: %s | Response content: %s", run_uuid, data.content)
+        return data.json()
 
     def prepare_data(
         self, data: Response, run_uuid: str | None = None
@@ -164,34 +173,7 @@ class DictResponseChecker(ResponseChecker):
         return None
 
 
-class JsonChecker(DictResponseChecker):
-    """A checker that compares a value in a JSON response against an expected value.
-
-    Example:
-        To check if a specific field "status" in a JSON response equals 200:
-
-        ```
-            checker = JsonChecker(lambda a, b: a == b, 200, dict_path="status")
-            assert checker.check(response) is True
-        ```"""
-
-    @staticmethod
-    def parse_response(
-        data: Response, run_uuid: str | None = None
-    ) -> dict[str, Any] | list[Any]:
-        """Parse the response content as JSON for comparison.
-
-        Args:
-            data (Response): The response containing the JSON data.
-            run_uuid (str | None): The unique run identifier. Defaults to None.
-
-        Returns:
-            dict[str, Any] | list[Any]: The parsed JSON response data for comparison."""
-        log.info("Check uuid: %s | Response content: %s", run_uuid, data.content)
-        return data.json()
-
-
-class HeadersChecker(DictResponseChecker):
+class HeadersChecker(JsonChecker):
     """A checker that compares response headers against expected values.
 
     Example:
