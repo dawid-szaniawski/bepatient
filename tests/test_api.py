@@ -73,6 +73,22 @@ class TestRequestsWaiter:
 
         assert response == dict_content_response
 
+    def test_happy_path_with_custom_checker(
+        self,
+        prepared_request: PreparedRequest,
+        session_mock: Session,
+        dict_content_response: Response,
+    ):
+        waiter = RequestsWaiter(request=prepared_request, session=session_mock)
+        checker = HeadersChecker(
+            comparer=isinstance, expected_value=str, dict_path="content"
+        )
+        waiter.add_custom_checker(checker)
+        response = waiter.run(retries=1).get_result()
+
+        assert response == dict_content_response
+        assert response.headers["content"] == "json"
+
     def test_condition_not_met_raise_error(
         self,
         prepared_request: PreparedRequest,
