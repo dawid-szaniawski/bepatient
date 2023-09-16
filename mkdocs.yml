@@ -67,4 +67,6 @@ plugins:
 nav:
   - Overview: index.md
   - Usage: usage.md
+  - Checkers: checkers.md
+  - Comparers: comparers.md
   - Roadmap: roadmap.md

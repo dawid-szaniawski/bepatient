@@ -121,14 +121,68 @@ class TestJsonChecker:
         checker = JsonChecker(is_equal, "TEST", search_query="name")
         assert checker.check(dict_content_response) is False
 
-    @pytest.mark.xfail(reason="The dictor library bug")
     def test_null_value(
         self,
         dict_content_response: Response,
         is_equal: Callable[[Any, Any], bool],
     ):
-        checker = JsonChecker(is_equal, None, dict_path="none", dictor_fallback="Empty")
+        checker = JsonChecker(is_equal, None, dict_path="none", dictor_fallback="Nope")
         assert checker.prepare_data(dict_content_response) is None
+
+    def test_empty_string_value(
+        self,
+        dict_content_response: Response,
+        is_equal: Callable[[Any, Any], bool],
+    ):
+        checker = JsonChecker(is_equal, None, dict_path="empty", dictor_fallback="Nope")
+        assert checker.prepare_data(dict_content_response) == ""
+
+    def test_false_value(
+        self,
+        dict_content_response: Response,
+        is_equal: Callable[[Any, Any], bool],
+    ):
+        checker = JsonChecker(is_equal, None, dict_path="false", dictor_fallback="Nope")
+        assert checker.prepare_data(dict_content_response) is False
+
+    def test_search_for_false_value(
+        self,
+        dict_content_response: Response,
+        is_equal: Callable[[Any, Any], bool],
+    ):
+        checker = JsonChecker(
+            is_equal, None, search_query="false", dictor_fallback="Nope"
+        )
+        assert checker.prepare_data(dict_content_response) == [False]
+
+    @pytest.mark.xfail(reason="The dictor library bug")
+    def test_search_for_null_value(
+        self,
+        dict_content_response: Response,
+        is_equal: Callable[[Any, Any], bool],
+    ):
+        checker = JsonChecker(
+            is_equal, None, search_query="none", dictor_fallback="Nope"
+        )
+        assert checker.prepare_data(dict_content_response) == [None]
+
+    def test_search_for_empty_string_value(
+        self,
+        dict_content_response: Response,
+        is_equal: Callable[[Any, Any], bool],
+    ):
+        checker = JsonChecker(
+            is_equal, None, search_query="empty", dictor_fallback="Nope"
+        )
+        assert checker.prepare_data(dict_content_response) == [""]
+
+    def test_search_for_nested_value_without_path(
+        self,
+        dict_content_response: Response,
+        is_equal: Callable[[Any, Any], bool],
+    ):
+        checker = JsonChecker(is_equal, None, search_query="name")
+        assert checker.prepare_data(dict_content_response) == ["John", "Mike", "Jack"]
 
     def test_prepare_data_catch_json_decode_error(
         self,

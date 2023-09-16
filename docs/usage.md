@@ -15,6 +15,8 @@ wait_for_values_in_request: in case of multiple conditions
 We can also use the `RequestsWaiter` object. However, it's important to remember that
 the default methods only allow the use of built-in checkers and comparers.
 
+---
+
 ### Basic methods
 
 #### `wait_for_value_in_request`
@@ -61,6 +63,8 @@ response = wait_for_value_in_request(
 )
 assert response.status_code == 200
 ```
+
+---
 
 #### `wait_for_values_in_request`
 
@@ -109,6 +113,8 @@ assert response.status_code == 200
 
 Both of the above methods use the `RequestsWaiter` object.
 
+---
+
 ### RequestsWaiter
 
 The `RequestsWaiter` class is a utility class designed to facilitate the setup and
@@ -141,6 +147,19 @@ Add a response checker to the waiter.
 response data. Defaults to None.
 - search_query `(str | None, optional)`: A search query to use to find the value in the
 response data. Defaults to None.
+
+###### Returns:
+
+- `self`: updated `RequestsWaiter` instance.
+
+##### add_custom_checker
+
+This method allows users to add their own custom response checker by providing an
+object that inherits from the abstract base class Checker.
+
+###### Args:
+- checker `(Checker)`: An instance of a custom checker object that inherits from the
+Checker class.
 
 ###### Returns:
 
@@ -194,57 +213,4 @@ response = waiter.run(retries=5, delay=2).get_result()
 print(response)
 ```
 
-### Default checkers
-
-When working with bepatient, you'll find that each checking object should inherit from
-the `Checker` class or one of its derived classes.
-At the moment, _bepatient_ exclusively supports response checkers:
-
-```yaml
-checkers:
-  - json_checker
-  - headers_checker
-```
-
-Furthermore, it's important to note that `RequestsExecutor` requires the `status_code`
-attribute. This is because, prior to evaluating other checkers, it employs the
-`StatusCodeChecker`, a subclass of `ResponseChecker`.
-
-For an extensive list of available checkers, refer to:
-
-```python
-from bepatient import CHECKERS
-
-
-print(CHECKERS)
-```
-
-### Default comparers
-
-Comparers serve as straightforward functions designed to compare two objects and return
-a boolean value. _bepatient_ offers a comprehensive range of default comparers,
-all designed to suit your testing needs. They can be accessed here:
-
-```python
-from bepatient import COMPARATORS
-
-
-print(COMPARATORS)
-```
-
-The basic comparers include:
-```yaml
-comparators:
-  - is_equal
-  - is_not_equal
-  - is_greater_than
-  - is_lesser_than
-  - is_greater_than_or_equal
-  - is_lesser_than_or_equal
-  - not_contain
-  - contain_all
-  - contain_any
-  - have_len_equal
-  - have_len_greater
-  - have_len_lesser
-```
+---
