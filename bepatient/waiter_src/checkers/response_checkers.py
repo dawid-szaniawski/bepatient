@@ -144,9 +144,7 @@ class JsonChecker(ResponseChecker):
         log.info("Check uuid: %s | Response content: %s", run_uuid, data.content)
         return data.json()
 
-    def prepare_data(
-        self, data: Response, run_uuid: str | None = None
-    ) -> dict[str, Any] | list[Any] | None:
+    def prepare_data(self, data: Response, run_uuid: str | None = None) -> Any:
         """Prepare the response data for comparison.
 
         Args:
@@ -154,7 +152,7 @@ class JsonChecker(ResponseChecker):
             run_uuid (str | None): The unique run identifier. Defaults to None.
 
         Returns:
-            dict[str, Any] | list[Any] | None: The prepared data for comparison."""
+            Any: The prepared data for comparison."""
         try:
             return dictor(
                 self.parse_response(data, run_uuid),

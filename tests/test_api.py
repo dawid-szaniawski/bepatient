@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 from requests import PreparedRequest, Response, Session
 
@@ -7,6 +9,7 @@ from bepatient import (
     wait_for_value_in_request,
     wait_for_values_in_request,
 )
+from bepatient.waiter_src.checker import Checker
 from bepatient.waiter_src.checkers.response_checkers import HeadersChecker
 from bepatient.waiter_src.comparators import is_equal
 from bepatient.waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
@@ -52,6 +55,25 @@ class TestRequestsWaiter:
         ).__dict__
 
         assert w_checker == checker
+
+    def test_add_custom_checker(self, prepared_request: PreparedRequest):
+        class CustomChecker(Checker):
+            def __init__(self):
+                self.name = "CustomChecker"
+                self.test_name = "test_add_custom_checker"
+
+            def __str__(self):
+                return f"{self.name} + {self.test_name}"
+
+            def check(self, data: Any) -> bool:
+                return isinstance(data, list)
+
+        checker = CustomChecker()
+        waiter = RequestsWaiter(request=prepared_request)
+        executor = waiter.add_custom_checker(checker).executor
+        w_checker = executor._checkers[0]  # pylint: disable=protected-access
+
+        assert w_checker is checker
 
     def test_happy_path(
         self,

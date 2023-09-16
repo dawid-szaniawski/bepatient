@@ -16,6 +16,9 @@ def dict_content_response() -> Response:
         "ok": True,
         "list": ["1", "2", "3"],
         "none": None,
+        "empty": "",
+        "false": False,
+        "name": "Jack",
     }
     res = Response()
     res.status_code = 200

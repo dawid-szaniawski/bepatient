@@ -3,6 +3,7 @@ from typing import Any
 from requests import PreparedRequest, Response, Session
 
 from .curler import Curler
+from .waiter_src.checker import Checker
 from .waiter_src.checkers import CHECKERS, RESPONSE_CHECKERS
 from .waiter_src.comparators import COMP_DICT, COMPARATORS
 from .waiter_src.executors.requests_executor import RequestsExecutor
@@ -86,6 +87,20 @@ class RequestsWaiter:
                 search_query=search_query,
             )
         )
+        return self
+
+    def add_custom_checker(self, checker: Checker):
+        """Add a custom response checker to the waiter.
+        This method allows users to add their own custom response checker by providing
+        an object that inherits from the abstract base class Checker.
+
+        Args:
+            checker (Checker): An instance of a custom checker object that inherits
+                from the Checker class.
+
+        Returns:
+            self: updated RequestsWaiter instance."""
+        self.executor.add_checker(checker)
         return self
 
     def run(self, retries: int = 60, delay: int = 1, raise_error: bool = True):
