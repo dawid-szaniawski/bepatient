@@ -28,7 +28,10 @@ print(CHECKERS)
 
 ## Custom checkers
 
-You just need to create an object that inherits from the `Checker` class:
+If the default checkers provided with _bepatient_ are not sufficient, you can create
+your own Checker.
+
+To do this, you need an object that inherits from the Checker class:
 
 ```python
 from abc import ABC, abstractmethod
