@@ -12,6 +12,8 @@ authors = [{ name = "Dawid Szaniawski", email = "webluduspl@gmail.com" }]
 license = { file = "LICENSE" }
 dependencies = [
     "dictor>=0.1.12",
+    "mysql-connector-python>=8.1.0",
+    "psycopg2>=2.9.7",
     "requests>=2.28.1"
 ]
 classifiers = [
@@ -117,5 +119,6 @@ disable = [
     "too-many-arguments",
     "missing-module-docstring",
     "missing-class-docstring",
-    "missing-function-docstring"
+    "missing-function-docstring",
+    "protected-access"
 ]

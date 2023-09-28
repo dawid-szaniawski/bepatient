@@ -1,4 +1,8 @@
 import json
+import os
+import sqlite3
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Callable
 
 import pytest
@@ -6,7 +10,7 @@ from pytest_mock import MockerFixture
 from requests import PreparedRequest, Response, Session
 from requests.models import CaseInsensitiveDict
 
-from bepatient.waiter_src.checker import Checker
+SCRIPTS_PATH = Path(__file__) / "../scripts/"
 
 
 @pytest.fixture(scope="session")
@@ -23,7 +27,7 @@ def dict_content_response() -> Response:
     res = Response()
     res.status_code = 200
     res.headers = CaseInsensitiveDict(content="json")
-    res._content = json.dumps(data).encode("utf-8")  # pylint: disable=protected-access
+    res._content = json.dumps(data).encode("utf-8")
     return res
 
 
@@ -57,30 +61,6 @@ def session_mock(
     return session
 
 
-@pytest.fixture(scope="session")
-def checker_true() -> Checker:
-    class CheckerMocker(Checker):
-        def __str__(self) -> str:
-            return "The truth"
-
-        def check(self, data: Any) -> bool:
-            return True
-
-    return CheckerMocker()
-
-
-@pytest.fixture(scope="session")
-def checker_false() -> Checker:
-    class CheckerMocker(Checker):
-        def __str__(self):
-            return "I'm falsy"
-
-        def check(self, data: Any) -> bool:
-            return False
-
-    return CheckerMocker()
-
-
 @pytest.fixture
 def is_equal() -> Callable[[Any, Any], bool]:
     def comparer(data: Any, expected_value: Any) -> bool:
@@ -98,3 +78,29 @@ def error_msg() -> str:
         " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
         " https://webludus.pl/"
     )
+
+
+@pytest.fixture
+def sqlite_db(tmp_path: Path) -> sqlite3.Cursor:  # type: ignore
+    def dict_factory(
+        cur: sqlite3.Cursor, row: tuple[str | int | datetime]
+    ) -> dict[str, str | int | datetime]:
+        fields = [column[0] for column in cur.description]
+        return dict(zip(fields, row))
+
+    conn = sqlite3.connect(
+        database=os.path.join(tmp_path, "bepatient.sqlite"),
+        detect_types=sqlite3.PARSE_DECLTYPES,
+    )
+    conn.row_factory = dict_factory
+    with open(SCRIPTS_PATH / "init_db.sql", mode="r", encoding="utf-8") as file:
+        conn.executescript(file.read())
+    cursor = conn.cursor()
+    yield cursor
+    cursor.close()
+    conn.close()
+
+
+@pytest.fixture
+def select_all_from_user_query() -> str:
+    return "SELECT * from user"

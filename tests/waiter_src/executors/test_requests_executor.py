@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -13,35 +13,37 @@ from bepatient.waiter_src.executors.requests_executor import RequestsExecutor
 class TestRequestExecutor:
     def test_executor_returns_true_for_expected_status_code(
         self,
-        mocker: MockerFixture,
+        prepared_request: PreparedRequest,
         session_mock: Session,
     ):
-        request = mocker.MagicMock()
         executor = RequestsExecutor(
-            request, expected_status_code=200, session=session_mock
+            prepared_request, expected_status_code=200, session=session_mock
         )
         assert executor.is_condition_met() is True
 
     def test_is_condition_met_returns_true_when_checker_pass(
         self,
-        mocker: MockerFixture,
+        prepared_request: PreparedRequest,
         session_mock: Session,
         checker_true: Checker,
     ):
-        request = mocker.MagicMock()
         executor = RequestsExecutor(
-            req_or_res=request, session=session_mock, expected_status_code=200
+            req_or_res=prepared_request, session=session_mock, expected_status_code=200
         ).add_checker(checker_true)
 
         assert executor.is_condition_met() is True
 
     def test_is_condition_met_returns_true_when_all_checkers_pass(
-        self, mocker: MockerFixture, session_mock: Session, checker_true: Checker
+        self,
+        prepared_request: PreparedRequest,
+        session_mock: Session,
+        checker_true: Checker,
     ):
-        request = mocker.MagicMock()
         executor = (
             RequestsExecutor(
-                req_or_res=request, expected_status_code=200, session=session_mock
+                req_or_res=prepared_request,
+                expected_status_code=200,
+                session=session_mock,
             )
             .add_checker(checker_true)
             .add_checker(checker_true)
@@ -50,26 +52,29 @@ class TestRequestExecutor:
         assert executor.is_condition_met() is True
 
     def test_is_condition_met_returns_false_when_checker_fail(
-        self, mocker: MockerFixture, session_mock: Session, checker_false: Checker
+        self,
+        prepared_request: PreparedRequest,
+        session_mock: Session,
+        checker_false: Checker,
     ):
-        request = mocker.MagicMock()
         executor = RequestsExecutor(
-            req_or_res=request, expected_status_code=200, session=session_mock
+            req_or_res=prepared_request, expected_status_code=200, session=session_mock
         ).add_checker(checker_false)
 
         assert executor.is_condition_met() is False
 
     def test_is_condition_met_returns_false_when_not_all_checkers_pass(
         self,
-        mocker: MockerFixture,
+        prepared_request: PreparedRequest,
         session_mock: Session,
         checker_true: Checker,
         checker_false: Checker,
     ):
-        request = mocker.MagicMock()
         executor = (
             RequestsExecutor(
-                req_or_res=request, expected_status_code=200, session=session_mock
+                req_or_res=prepared_request,
+                expected_status_code=200,
+                session=session_mock,
             )
             .add_checker(checker_false)
             .add_checker(checker_true)
@@ -78,25 +83,26 @@ class TestRequestExecutor:
         assert executor.is_condition_met() is False
 
     def test_is_condition_met_returns_false_when_status_code_check_fail(
-        self, mocker: MockerFixture, checker_true: Checker
+        self,
+        prepared_request: PreparedRequest,
+        mocker: MockerFixture,
+        checker_true: Checker,
     ):
-        request = mocker.MagicMock()
         session = mocker.MagicMock()
         response = mocker.MagicMock()
         response.status_code = 404
         session.send.return_value = response
         executor = RequestsExecutor(
-            req_or_res=request, expected_status_code=200, session=session
+            req_or_res=prepared_request, expected_status_code=200, session=session
         ).add_checker(checker_true)
 
         assert executor.is_condition_met() is False
 
     def test_get_result_raises_exception_when_condition_has_not_been_checked(
-        self, mocker: MockerFixture, session_mock: Session
+        self, prepared_request: PreparedRequest, session_mock: Session
     ):
-        request = mocker.MagicMock()
         executor = RequestsExecutor(
-            req_or_res=request, expected_status_code=200, session=session_mock
+            req_or_res=prepared_request, expected_status_code=200, session=session_mock
         )
 
         msg = "The condition has not yet been checked."
@@ -105,14 +111,13 @@ class TestRequestExecutor:
 
     def test_get_result_returns_response(
         self,
-        mocker: MockerFixture,
+        prepared_request: PreparedRequest,
         session_mock: Session,
         dict_content_response: Response,
         checker_true: Checker,
     ):
-        request = mocker.MagicMock()
         executor = RequestsExecutor(
-            req_or_res=request, session=session_mock, expected_status_code=200
+            req_or_res=prepared_request, session=session_mock, expected_status_code=200
         ).add_checker(checker_true)
 
         executor.is_condition_met()
@@ -163,10 +168,14 @@ class TestRequestExecutor:
         prepared_request: PreparedRequest,
         session_mock: Session,
         checker_false: Checker,
+        is_equal: Callable[[Any, Any], bool],
     ):
         class CheckerMocker(Checker):
-            def __str__(self):
+            def __str__(self) -> str:
                 return "I'm even more falsy"
+
+            def prepare_data(self, data: Any, run_uuid: str | None = None) -> None:
+                """mock"""
 
             def check(self, data: Any) -> bool:
                 return False
@@ -178,7 +187,7 @@ class TestRequestExecutor:
                 expected_status_code=200,
             )
             .add_checker(checker_false)
-            .add_checker(CheckerMocker())
+            .add_checker(CheckerMocker(is_equal, ""))
             .add_checker(checker_false)
         )
 
@@ -192,16 +201,29 @@ class TestRequestExecutor:
         )
 
     def test_error_message_raises_exception_when_condition_has_not_been_checked(
-        self, mocker: MockerFixture, session_mock: Session
+        self, prepared_request: PreparedRequest, session_mock: Session
     ):
-        request = mocker.MagicMock()
         executor = RequestsExecutor(
-            req_or_res=request, expected_status_code=200, session=session_mock
+            req_or_res=prepared_request, expected_status_code=200, session=session_mock
         )
 
         msg = "The condition has not yet been checked."
         with pytest.raises(ExecutorIsNotReady, match=msg):
             executor.error_message()
+
+    def test_condition_met_error_message(
+        self,
+        prepared_request: PreparedRequest,
+        session_mock: Session,
+        checker_true: Checker,
+    ):
+        executor = RequestsExecutor(
+            req_or_res=prepared_request, session=session_mock, expected_status_code=200
+        ).add_checker(checker_true)
+
+        executor.is_condition_met()
+
+        assert executor.error_message() == "All conditions have been met."
 
     def test_except_request_exception(
         self,

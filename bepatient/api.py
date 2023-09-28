@@ -1,12 +1,17 @@
+import sqlite3
 from typing import Any
 
+from mysql.connector.cursor import CursorBase as MySqlCursor
+from psycopg2.extensions import cursor as Psycopg2Cursor
 from requests import PreparedRequest, Response, Session
 
 from .curler import Curler
 from .waiter_src.checker import Checker
 from .waiter_src.checkers import CHECKERS, RESPONSE_CHECKERS
+from .waiter_src.checkers.sql_checkers import ResultType, SQLChecker
 from .waiter_src.comparators import COMP_DICT, COMPARATORS
 from .waiter_src.executors.requests_executor import RequestsExecutor
+from .waiter_src.executors.sql_executor import SQLExecutor
 from .waiter_src.waiter import wait_for_executor
 
 
@@ -270,3 +275,83 @@ def wait_for_values_in_request(
         waiter.add_checker(**checker_dict)
 
     return waiter.run(retries=retries, delay=delay).get_result()
+
+
+class SQLWaiter:
+    def __init__(
+        self, cursor: sqlite3.Cursor | Psycopg2Cursor | MySqlCursor, query: str
+    ):
+        self.executor = SQLExecutor(cursor=cursor, query=query)
+
+    def add_checker(
+        self,
+        expected_value: Any,
+        comparer: COMPARATORS,
+        dict_path: str | None = None,
+        search_query: str | None = None,
+    ):
+        """Add a response checker to the waiter.
+
+        Args:
+            expected_value (Any): The value to be compared against the response data.
+            comparer (COMPARATORS): The comparer function or operator used for
+                value comparison.
+            dict_path (str | None, optional): The dot-separated path to the value in the
+                response data. Defaults to None.
+            search_query (str | None, optional): A search query to use to find the value
+                in the response data. Defaults to None.
+
+        Returns:
+            self: updated RequestsWaiter instance."""
+        self.executor.add_checker(
+            SQLChecker(
+                comparer=COMP_DICT[comparer],
+                expected_value=expected_value,
+                dict_path=dict_path,
+                search_query=search_query,
+            )
+        )
+        return self
+
+    def add_custom_checker(self, checker: Checker):
+        """Add a custom response checker to the waiter.
+        This method allows users to add their own custom response checker by providing
+        an object that inherits from the abstract base class Checker.
+
+        Args:
+            checker (Checker): An instance of a custom checker object that inherits
+                from the Checker class.
+
+        Returns:
+            self: updated RequestsWaiter instance."""
+        self.executor.add_checker(checker)
+        return self
+
+    def run(self, retries: int = 60, delay: int = 1, raise_error: bool = True):
+        """Run the waiter and monitor the specified request or response.
+
+        Args:
+            retries (int, optional): The number of retries to perform. Defaults to 60.
+            delay (int, optional): The delay between retries in seconds. Defaults to 1.
+            raise_error (bool): raises WaiterConditionWasNotMet.
+
+        Returns:
+            self: updated RequestsWaiter instance.
+
+        Raises:
+            WaiterConditionWasNotMet: if the condition is not met within the specified
+                number of attempts."""
+        wait_for_executor(
+            executor=self.executor,
+            retries=retries,
+            delay=delay,
+            raise_error=raise_error,
+        )
+        return self
+
+    def get_result(self) -> ResultType:
+        """Get the final response containing the expected values.
+
+        Returns:
+            Response: final response containing the expected values."""
+        return self.executor.get_result()

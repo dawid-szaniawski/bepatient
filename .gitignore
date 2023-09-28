@@ -54,3 +54,4 @@ venv.bak/
 .ruff_cache/
 cov_html/
 site/
+.vscode/

@@ -52,7 +52,7 @@ class TestStatusCodeChecker:
         monkeypatch.setattr("uuid.uuid4", lambda: "TestStatusCodeChecker")
         logs = [
             (
-                "bepatient.waiter_src.checkers.response_checkers",
+                "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker | "
                 "Comparer: comparer | Expected_value: 200 | Data: 200",
@@ -272,7 +272,7 @@ class TestHeadersChecker:
         checker = HeadersChecker(is_equal, "John", dict_path="name")
         logs = [
             (
-                "bepatient.waiter_src.checkers.response_checkers",
+                "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None | Expected_value: John"
@@ -307,7 +307,7 @@ class TestHeadersChecker:
         checker = HeadersChecker(is_equal, "Joe", dict_path="name")
         logs = [
             (
-                "bepatient.waiter_src.checkers.response_checkers",
+                "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker | Comparer: "
                 "comparer | Dictor_fallback: None | Expected_value: Joe | Path: name | "
@@ -321,7 +321,7 @@ class TestHeadersChecker:
                 "'list': \"['1', '2', '3']\"}",
             ),
             (
-                "bepatient.waiter_src.checkers.response_checkers",
+                "bepatient.waiter_src.checker",
                 10,
                 "Check uuid: TestHeadersChecker | Condition not met"
                 " | Expected: Joe | Data: John",

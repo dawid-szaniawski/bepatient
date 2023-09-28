@@ -4,10 +4,8 @@ from requests import PreparedRequest, Response, Session
 from requests.exceptions import RequestException
 
 from bepatient.curler import Curler
-from bepatient.waiter_src.checker import Checker
 from bepatient.waiter_src.checkers.response_checkers import StatusCodeChecker
 from bepatient.waiter_src.comparators import is_equal
-from bepatient.waiter_src.exceptions.executor_exceptions import ExecutorIsNotReady
 from bepatient.waiter_src.executor import Executor
 
 log = logging.getLogger(__name__)
@@ -25,10 +23,8 @@ class RequestsExecutor(Executor):
         expected_status_code: int,
         session: Session | None = None,
     ):
+        super().__init__()
         self._status_code_checker = StatusCodeChecker(is_equal, expected_status_code)
-        self._checkers: list[Checker] = []
-        self._failed_checkers: list[Checker] = []
-        self._response: Response | None = None
 
         if session:
             self.session = session
@@ -39,7 +35,7 @@ class RequestsExecutor(Executor):
         if isinstance(req_or_res, Response):
             log.info("Merging response data into session")
             self.session.headers.update(req_or_res.request.headers)
-            self._response = req_or_res
+            self._result = req_or_res
             if len(req_or_res.history) > 0:
                 self.request = req_or_res.history[0].request
             else:
@@ -47,10 +43,7 @@ class RequestsExecutor(Executor):
         else:
             self.request = req_or_res
 
-    def add_checker(self, checker: Checker):
-        """Adds checker function to the list of checkers."""
-        self._checkers.append(checker)
-        return self
+        self._input = Curler().to_curl(self.request)
 
     def is_condition_met(self) -> bool:
         """Sends the request and check if all checkers pass or timeout occurs.
@@ -61,16 +54,14 @@ class RequestsExecutor(Executor):
         Raises:
             ExecutorIsNotReady: If the executor is not ready to send the request."""
         try:
-            self._response = self.session.send(self.request)
+            self._result = self.session.send(self.request)
         except RequestException:
             log.exception("RequestException! CURL: %s", Curler().to_curl(self.request))
             return False
 
-        if self._status_code_checker.check(self._response):
+        if self._status_code_checker.check(self._result):
             self._failed_checkers = [
-                checker
-                for checker in self._checkers
-                if not checker.check(self._response)
+                checker for checker in self._checkers if not checker.check(self._result)
             ]
         else:
             self._failed_checkers = [self._status_code_checker]
@@ -78,20 +69,3 @@ class RequestsExecutor(Executor):
         if len(self._failed_checkers) == 0:
             return True
         return False
-
-    def get_result(self) -> Response:
-        """Returns the response received from the server."""
-        if self._response is not None:
-            return self._response
-        raise ExecutorIsNotReady()
-
-    def error_message(self) -> str:
-        """Return a detailed error message if the condition has not been met."""
-        if self._response is not None and len(self._failed_checkers) > 0:
-            checkers = ", ".join([str(checker) for checker in self._failed_checkers])
-            return (
-                "The condition has not been met!"
-                f" | Failed checkers: ({checkers})"
-                f" | {Curler().to_curl(self.request)}"
-            )
-        raise ExecutorIsNotReady()
