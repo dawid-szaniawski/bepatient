@@ -13,7 +13,7 @@ checkers:
 
 Furthermore, it's important to note that `RequestsExecutor` requires the `status_code`
 attribute. This is because, prior to evaluating other checkers, it employs the
-`StatusCodeChecker`, a subclass of `ResponseChecker`.
+`StatusCodeChecker`.
 
 For an extensive list of available checkers, refer to:
 
