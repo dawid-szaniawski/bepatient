@@ -1,16 +1,10 @@
 import json
-import os
-import sqlite3
-from datetime import datetime
-from pathlib import Path
 from typing import Any, Callable
 
 import pytest
 from pytest_mock import MockerFixture
 from requests import PreparedRequest, Response, Session
 from requests.models import CaseInsensitiveDict
-
-SCRIPTS_PATH = Path(__file__) / "../scripts/"
 
 
 @pytest.fixture(scope="session")
@@ -78,29 +72,3 @@ def error_msg() -> str:
         " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
         " https://webludus.pl/"
     )
-
-
-@pytest.fixture
-def sqlite_db(tmp_path: Path) -> sqlite3.Cursor:  # type: ignore
-    def dict_factory(
-        cur: sqlite3.Cursor, row: tuple[str | int | datetime]
-    ) -> dict[str, str | int | datetime]:
-        fields = [column[0] for column in cur.description]
-        return dict(zip(fields, row))
-
-    conn = sqlite3.connect(
-        database=os.path.join(tmp_path, "bepatient.sqlite"),
-        detect_types=sqlite3.PARSE_DECLTYPES,
-    )
-    conn.row_factory = dict_factory
-    with open(SCRIPTS_PATH / "init_db.sql", mode="r", encoding="utf-8") as file:
-        conn.executescript(file.read())
-    cursor = conn.cursor()
-    yield cursor
-    cursor.close()
-    conn.close()
-
-
-@pytest.fixture
-def select_all_from_user_query() -> str:
-    return "SELECT * from user"
