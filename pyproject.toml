@@ -87,7 +87,7 @@ markers = "e2e: end-to-end tests"
 
 [tool.black]
 line-length = 88
-target-version = ['py310']
+target-version = ['py311']
 
 [tool.isort]
 profile = "black"
@@ -117,5 +117,6 @@ disable = [
     "too-many-arguments",
     "missing-module-docstring",
     "missing-class-docstring",
-    "missing-function-docstring"
+    "missing-function-docstring",
+    "protected-access"
 ]

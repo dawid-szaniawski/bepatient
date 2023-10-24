@@ -6,8 +6,6 @@ from pytest_mock import MockerFixture
 from requests import PreparedRequest, Response, Session
 from requests.models import CaseInsensitiveDict
 
-from bepatient.waiter_src.checker import Checker
-
 
 @pytest.fixture(scope="session")
 def dict_content_response() -> Response:
@@ -23,7 +21,7 @@ def dict_content_response() -> Response:
     res = Response()
     res.status_code = 200
     res.headers = CaseInsensitiveDict(content="json")
-    res._content = json.dumps(data).encode("utf-8")  # pylint: disable=protected-access
+    res._content = json.dumps(data).encode("utf-8")
     return res
 
 
@@ -55,30 +53,6 @@ def session_mock(
     session = mocker.MagicMock()
     session.send.return_value = dict_content_response
     return session
-
-
-@pytest.fixture(scope="session")
-def checker_true() -> Checker:
-    class CheckerMocker(Checker):
-        def __str__(self) -> str:
-            return "The truth"
-
-        def check(self, data: Any) -> bool:
-            return True
-
-    return CheckerMocker()
-
-
-@pytest.fixture(scope="session")
-def checker_false() -> Checker:
-    class CheckerMocker(Checker):
-        def __str__(self):
-            return "I'm falsy"
-
-        def check(self, data: Any) -> bool:
-            return False
-
-    return CheckerMocker()
 
 
 @pytest.fixture

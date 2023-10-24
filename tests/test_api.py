@@ -1,4 +1,6 @@
 import pytest
+from _pytest.logging import LogCaptureFixture
+from pytest_mock import MockerFixture
 from requests import PreparedRequest, Response, Session
 
 from bepatient import (
@@ -30,7 +32,7 @@ class TestRequestsWaiter:
         assert executor.request == prepared_request
         assert executor.session == session_mock
 
-        checker = executor._status_code_checker  # pylint: disable=protected-access
+        checker = executor._status_code_checker
         assert checker.expected_value == 201
 
     def test_add_checker(self, prepared_request: PreparedRequest):
@@ -42,22 +44,21 @@ class TestRequestsWaiter:
             dict_path="dict",
             search_query="search",
         ).executor
-        w_checker = executor._checkers[0].__dict__  # pylint: disable=protected-access
 
         checker = HeadersChecker(
             comparer=is_equal,
             expected_value="TEST",
             dict_path="dict",
             search_query="search",
-        ).__dict__
+        )
 
-        assert w_checker == checker
+        assert executor._checkers[0].__dict__ == checker.__dict__
 
     def test_add_custom_checker(self, prepared_request: PreparedRequest):
         checker = HeadersChecker(isinstance, dict)
         waiter = RequestsWaiter(request=prepared_request)
         executor = waiter.add_custom_checker(checker).executor
-        w_checker = executor._checkers[0]  # pylint: disable=protected-access
+        w_checker = executor._checkers[0]
 
         assert w_checker is checker
 
@@ -114,6 +115,107 @@ class TestRequestsWaiter:
         waiter.run(retries=1, raise_error=False)
 
         assert waiter.get_result() == dict_content_response
+
+    def test_wait_for_value(
+        self,
+        mocker: MockerFixture,
+        prepared_request: PreparedRequest,
+        dict_content_response: Response,
+        headers_response: Response,
+        caplog: LogCaptureFixture,
+    ):
+        mocker.patch("uuid.uuid4", side_effect=["TEST1", "TEST2", "TEST3", "TEST4"])
+        mocker.patch(
+            "requests.Session.send",
+            side_effect=[dict_content_response, headers_response],
+        )
+        logs = [
+            (
+                "bepatient.waiter_src.executors.requests_executor",
+                20,
+                "Creating a new Session object",
+            ),
+            (
+                "bepatient.waiter_src.waiter",
+                10,
+                "Checking whether the condition has been met. The 1 approach",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check uuid: TEST1 | Checker: StatusCodeChecker | Comparer: is_equal"
+                " | Expected_value: 200 | Data: 200",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TEST1 | Response status code: 200",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check uuid: TEST2 | Checker: HeadersChecker | Comparer: is_equal"
+                " | Dictor_fallback: None | Expected_value: John | Path: name"
+                " | Search_query: None | Data: John",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TEST2 | Response headers: {'content': 'json'}",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                10,
+                "Check uuid: TEST2 | Condition not met | Expected: John | Data: None",
+            ),
+            (
+                "bepatient.waiter_src.waiter",
+                10,
+                "The condition has not been met. Waiting: 1",
+            ),
+            (
+                "bepatient.waiter_src.waiter",
+                10,
+                "Checking whether the condition has been met. The 2 approach",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check uuid: TEST3 | Checker: StatusCodeChecker | Comparer: is_equal | "
+                "Expected_value: 200 | Data: 200",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TEST3 | Response status code: 200",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check uuid: TEST4 | Checker: HeadersChecker | Comparer: is_equal | "
+                "Dictor_fallback: None | Expected_value: John | Path: name"
+                " | Search_query: None | Data: John",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TEST4 | Response headers: {'name': 'John', 'age': "
+                "'30', 'list': \"['1', '2', '3']\"}",
+            ),
+            ("bepatient.waiter_src.waiter", 10, "Condition met!"),
+        ]
+
+        waiter = RequestsWaiter(request=prepared_request)
+        waiter.add_checker(
+            expected_value="John",
+            comparer="is_equal",
+            checker="headers_checker",
+            dict_path="name",
+        )
+        waiter.run(retries=2)
+
+        assert waiter.get_result() == headers_response
+        assert caplog.record_tuples == logs
 
 
 class TestWaitForValueInRequests:
