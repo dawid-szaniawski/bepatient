@@ -32,6 +32,7 @@ class RequestsWaiter:
         status_code (int, optional): The expected HTTP status code. Defaults to 200.
         session (Session | None, optional): The requests session to use for sending
             requests. Defaults to None.
+        timeout (int | None, optional): request timeout in seconds.
 
     Example:
         To wait for a JSON response where the "status" field equals 200 using a
@@ -51,9 +52,13 @@ class RequestsWaiter:
         request: PreparedRequest | Response,
         status_code: int = 200,
         session: Session | None = None,
+        timeout: int = 5,
     ):
         self.executor = RequestsExecutor(
-            req_or_res=request, expected_status_code=status_code, session=session
+            req_or_res=request,
+            expected_status_code=status_code,
+            session=session,
+            timeout=timeout,
         )
 
     def add_checker(

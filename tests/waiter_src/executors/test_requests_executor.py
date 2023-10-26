@@ -231,7 +231,9 @@ class TestRequestExecutor:
         prepared_request: PreparedRequest,
         caplog: LogCaptureFixture,
     ):
-        def error_mock(_: PreparedRequest):
+        def error_mock(request: PreparedRequest, timeout: int):
+            assert request == prepared_request
+            assert timeout == 1
             raise RequestException()
 
         session = mocker.MagicMock()
@@ -246,7 +248,10 @@ class TestRequestExecutor:
         ]
 
         executor = RequestsExecutor(
-            req_or_res=prepared_request, expected_status_code=200, session=session
+            req_or_res=prepared_request,
+            expected_status_code=200,
+            session=session,
+            timeout=1
         )
 
         assert executor.is_condition_met() is False
@@ -323,3 +328,10 @@ class TestRequestExecutor:
         )
 
         assert executor.request == prepared_request
+
+    def test_set_5s_timeout_if_timeout_not_provided(self, prepared_request):
+        executor = RequestsExecutor(
+            req_or_res=prepared_request, expected_status_code=200
+        )
+
+        assert executor.timeout == 5
