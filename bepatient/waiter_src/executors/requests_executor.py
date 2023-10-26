@@ -16,8 +16,8 @@ class RequestsExecutor(Executor):
     Args:
         req_or_res (PreparedRequest): request to send.
         expected_status_code (int): expected HTTP status code of the response
-        session (Session): requests session to use.
-        timeout (int): request timeout in seconds."""
+        session (Session | None, optional): requests session to use.
+        timeout (int | None, optional): request timeout in seconds."""
 
     def __init__(
         self,
