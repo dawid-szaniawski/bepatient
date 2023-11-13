@@ -251,7 +251,7 @@ class TestRequestExecutor:
             req_or_res=prepared_request,
             expected_status_code=200,
             session=session,
-            timeout=1
+            timeout=1,
         )
 
         assert executor.is_condition_met() is False
