@@ -1,4 +1,5 @@
-from typing import Any, Iterable, Literal, Sized
+from collections.abc import Iterable, Sized
+from typing import Any, Literal
 
 
 def is_equal(data: Any, expected_value: Any) -> bool:
