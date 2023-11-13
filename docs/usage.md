@@ -132,7 +132,7 @@ Additionally, the user can also specify:
 - status_code `(int, optional)`: The expected HTTP status code. Defaults to 200.
 - session `(Session | None, optional)`: The requests session to use for sending
 requests. Defaults to None.
-- timeout (int | None, optional): request timeout in seconds. Defaults to 5 seconds.
+- timeout `(int | None, optional)`: request timeout in seconds. Defaults to 5 seconds.
 
 #### Methods
 
