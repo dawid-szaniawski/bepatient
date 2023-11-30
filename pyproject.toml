@@ -73,7 +73,7 @@ Documentation = "https://webludus.pages.dev/"
 include-package-data = false
 
 [tool.setuptools.dynamic]
-version = {attr = "bepatient.__version__"}
+version = { attr = "bepatient.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["bepatient*"]
@@ -82,7 +82,7 @@ namespaces = false
 
 [tool.pytest.ini_options]
 addopts = "--durations=2"
-log_cli = true
+log_cli = false
 log_cli_level = "debug"
 markers = "e2e: end-to-end tests"
 
@@ -93,7 +93,7 @@ target-version = ['py312']
 [tool.isort]
 profile = "black"
 line_length = 88
-src_paths= ["bepatient","test"]
+src_paths = ["bepatient", "test"]
 
 [tool.ruff]
 line-length = 88
