@@ -5,6 +5,7 @@ from requests import PreparedRequest, Response, Session
 
 from bepatient import (
     RequestsWaiter,
+    dict_differences,
     to_curl,
     wait_for_value_in_request,
     wait_for_values_in_request,
@@ -12,15 +13,6 @@ from bepatient import (
 from bepatient.waiter_src.checkers.response_checkers import HeadersChecker
 from bepatient.waiter_src.comparators import is_equal
 from bepatient.waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
-
-
-def test_to_curl(prepared_request: PreparedRequest):
-    expected_curl = (
-        "curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' "
-        "https://webludus.pl/"
-    )
-
-    assert to_curl(prepared_request) == expected_curl
 
 
 class TestRequestsWaiter:
@@ -149,7 +141,10 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TEST1 | Response status code: 200",
+                "Check uuid: TEST1 | Response status code: 200 | Response content: "
+                'b\'{"list_of_dicts": [{"name": "John", "age": 30},'
+                ' {"name": "Mike", "age": 15}], "ok": true, "list": ["1", "2", "3"],'
+                ' "none": null, "empty": "", "false": false, "name": "Jack"}\'',
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -187,13 +182,14 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TEST3 | Response status code: 200",
+                "Check uuid: TEST3 | Response status code: 200"
+                " | Response content: None",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: TEST4 | Checker: HeadersChecker | Comparer: is_equal | "
-                "Dictor_fallback: None | Expected_value: John | Path: name"
+                "Check uuid: TEST4 | Checker: HeadersChecker | Comparer: is_equal"
+                " | Dictor_fallback: None | Expected_value: John | Path: name"
                 " | Search_query: None | Data: John",
             ),
             (
@@ -320,3 +316,28 @@ class TestWaitForValuesInRequests:
                 checkers=list_of_checkers,
                 retries=1,
             )
+
+
+def test_dict_differences():
+    expected_dict = {
+        "Key1": 1,
+        "Key2": None,
+        "Key3": "STRING",
+        "Key4": "Another string",
+    }
+    actual_dict = {"Key1": 2, "Key5": False, "Key3": "STRING", "1": True}
+    msg = {
+        "key_missing_exp": {"Key2", "Key4"},
+        "key_missing_actual": {"Key5", "1"},
+        "value_diff": {"Key1": {"expected": 1, "actual": 2}},
+    }
+    assert dict_differences(expected_dict=expected_dict, actual_dict=actual_dict) == msg
+
+
+def test_to_curl(prepared_request: PreparedRequest):
+    expected_curl = (
+        "curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' "
+        "https://webludus.pl/"
+    )
+
+    assert to_curl(prepared_request) == expected_curl

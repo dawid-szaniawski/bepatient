@@ -10,20 +10,6 @@ from .waiter_src.executors.requests_executor import RequestsExecutor
 from .waiter_src.waiter import wait_for_executor
 
 
-def to_curl(req_or_res: PreparedRequest | Response, charset: str | None = None) -> str:
-    """Converts a `PreparedRequest` or a `Response` object to a `curl` command.
-
-    Args:
-        req_or_res (PreparedRequest | Response): The `PreparedRequest` or `Response`
-            object to be converted.
-        charset (str, optional): The character set to use for encoding the
-            request body, if it is a byte string. Defaults to "utf-8".
-
-    Returns:
-        the `curl` command as a string"""
-    return Curler().to_curl(req_or_res, charset)
-
-
 class RequestsWaiter:
     """Utility class for setting up and monitoring requests for expected values.
 
@@ -275,3 +261,68 @@ def wait_for_values_in_request(
         waiter.add_checker(**checker_dict)
 
     return waiter.run(retries=retries, delay=delay).get_result()
+
+
+def dict_differences(
+    expected_dict: dict[str, Any], actual_dict: dict[str, Any]
+) -> dict[str, set[str] | dict[str, Any]]:
+    """Compares two dictionaries and identifies the differences in keys and values.
+
+    Args:
+        expected_dict: dictionary with expected key-value pairs.
+        actual_dict: dictionary with actual key-value pairs.
+
+    Returns:
+        dict: A dictionary containing the following information:
+            - 'key_missing_exp' (set): Keys present in expected_dict but not in
+                actual_dict.
+            - 'key_missing_actual' (set): Keys present in actual_dict but not in
+                expected_dict.
+            - 'value_diff' (dict): Dictionary of differing key-value pairs, with keys
+                present in both dictionaries and values not matching. Each differing
+                pair is represented as
+                {'expected': expected_value, 'actual': actual_value}.
+
+    Example:
+        ```python
+            expected = {'a': 1, 'b': 2, 'c': 3}
+            actual = {'a': 1, 'b': 5, 'd': 4}
+            differences = dict_differences(expected, actual)
+            print(differences)
+        ```
+    Output:
+        ```
+            {
+                'key_missing_exp': {'c'},
+                'key_missing_actual': {'d'},
+                'value_diff': {'b': {'expected': 2, 'actual': 5}}
+            }
+        ```"""
+    missing_k_exp = expected_dict.keys() - actual_dict.keys()
+    missing_k_act = actual_dict.keys() - expected_dict.keys()
+
+    value_diff = {
+        key: {"expected": expected_dict[key], "actual": actual_dict[key]}
+        for key in expected_dict.keys() & actual_dict.keys()
+        if expected_dict[key] != actual_dict[key]
+    }
+
+    return {
+        "key_missing_exp": missing_k_exp,
+        "key_missing_actual": missing_k_act,
+        "value_diff": value_diff,
+    }
+
+
+def to_curl(req_or_res: PreparedRequest | Response, charset: str | None = None) -> str:
+    """Converts a `PreparedRequest` or a `Response` object to a `curl` command.
+
+    Args:
+        req_or_res (PreparedRequest | Response): The `PreparedRequest` or `Response`
+            object to be converted.
+        charset (str, optional): The character set to use for encoding the
+            request body, if it is a byte string. Defaults to "utf-8".
+
+    Returns:
+        the `curl` command as a string"""
+    return Curler().to_curl(req_or_res, charset)

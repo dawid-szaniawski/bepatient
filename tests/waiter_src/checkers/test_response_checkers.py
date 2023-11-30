@@ -34,7 +34,7 @@ class TestStatusCodeChecker:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: None | Response status code: 200",
+                "Check uuid: None | Response status code: 200 | Response content: None",
             )
         ]
 
@@ -43,7 +43,7 @@ class TestStatusCodeChecker:
 
     def test_check(
         self,
-        headers_response: Response,
+        dict_content_response: Response,
         is_equal: Callable[[Any, Any], bool],
         caplog: LogCaptureFixture,
         monkeypatch: pytest.MonkeyPatch,
@@ -54,17 +54,20 @@ class TestStatusCodeChecker:
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker | "
-                "Comparer: comparer | Expected_value: 200 | Data: 200",
+                "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
+                " | Comparer: comparer | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TestStatusCodeChecker | Response status code: 200",
+                "Check uuid: TestStatusCodeChecker | Response status code: 200"
+                ' | Response content: b\'{"list_of_dicts": [{"name": "John", "age": 30}'
+                ', {"name": "Mike", "age": 15}], "ok": true, "list": ["1", "2", "3"]'
+                ', "none": null, "empty": "", "false": false, "name": "Jack"}\'',
             ),
         ]
 
-        assert checker.check(headers_response) is True
+        assert checker.check(dict_content_response) is True
         assert caplog.record_tuples == logs
 
 

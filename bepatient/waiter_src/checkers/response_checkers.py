@@ -21,7 +21,12 @@ class StatusCodeChecker(Checker):
         Returns:
             int: prepared status code for comparison."""
         status_code = data.status_code
-        log.info("Check uuid: %s | Response status code: %s", run_uuid, status_code)
+        log.info(
+            "Check uuid: %s | Response status code: %s | Response content: %s",
+            run_uuid,
+            status_code,
+            data.content,
+        )
         return status_code
 
 
@@ -54,10 +59,10 @@ class JsonChecker(Checker):
         search_query: str | None = None,
         dictor_fallback: str | None = None,
     ):
+        super().__init__(comparer, expected_value)
         self.path = dict_path
         self.search_query = search_query
         self.dictor_fallback = dictor_fallback
-        super().__init__(comparer, expected_value)
 
     @staticmethod
     def parse_response(
