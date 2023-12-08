@@ -14,14 +14,14 @@ log = logging.getLogger(__name__)
 class RequestsExecutor(Executor):
     """An executor that sends a request and waits for a certain condition to be met.
     Args:
-        req_or_res (PreparedRequest): request to send.
+        req_or_res (PreparedRequest | Request | Response): request to send.
         expected_status_code (int): expected HTTP status code of the response
         session (Session | None, optional): requests session to use.
         timeout (int | None, optional): request timeout in seconds."""
 
     def __init__(
         self,
-        req_or_res: Request | Response | PreparedRequest,
+        req_or_res: PreparedRequest | Request | Response,
         expected_status_code: int,
         session: Session | None = None,
         timeout: int = 5,
@@ -43,9 +43,9 @@ class RequestsExecutor(Executor):
         else:
             self._result = req_or_res
             if len(self._result.history) > 0:
-                self.request = req_or_res.history[0].request
+                self.request = self._result.history[0].request
             else:
-                self.request = req_or_res.request
+                self.request = self._result.request
             self._merge_session_data_to_prepared_request()
 
         self._input = Curler().to_curl(self.request)
