@@ -1,6 +1,6 @@
 from typing import Any
 
-from requests import PreparedRequest, Response, Session
+from requests import PreparedRequest, Request, Response, Session
 
 from .curler import Curler
 from .waiter_src.checker import Checker
@@ -14,7 +14,7 @@ class RequestsWaiter:
     """Utility class for setting up and monitoring requests for expected values.
 
     Args:
-        request (PreparedRequest | Response): request or response to monitor.
+        request (PreparedRequest | Request | Response): request or response to monitor.
         status_code (int, optional): The expected HTTP status code. Defaults to 200.
         session (Session | None, optional): The requests session to use for sending
             requests. Defaults to None.
@@ -35,7 +35,7 @@ class RequestsWaiter:
 
     def __init__(
         self,
-        request: PreparedRequest | Response,
+        request: PreparedRequest | Request | Response,
         status_code: int = 200,
         session: Session | None = None,
         timeout: int = 5,
@@ -125,7 +125,7 @@ class RequestsWaiter:
 
 
 def wait_for_value_in_request(
-    request: PreparedRequest | Response,
+    request: PreparedRequest | Request | Response,
     status_code: int = 200,
     comparer: COMPARATORS | None = None,
     expected_value: Any = None,
@@ -139,8 +139,8 @@ def wait_for_value_in_request(
     """Wait for a specified value in a response.
 
     Args:
-        request (PreparedRequest | Response): The request or response to monitor for
-            the expected value.
+        request (PreparedRequest | Request | Response): The request or response to
+            monitor for the expected value.
         status_code (int, optional): The expected HTTP status code. Defaults to 200.
         comparer (COMPARATORS | None, optional): The comparer function or operator used
             for value comparison. Defaults to None.
@@ -192,7 +192,7 @@ def wait_for_value_in_request(
 
 
 def wait_for_values_in_request(
-    request: PreparedRequest | Response,
+    request: PreparedRequest | Request | Response,
     checkers: list[dict[str, Any]],
     status_code: int = 200,
     session: Session | None = None,
@@ -202,8 +202,8 @@ def wait_for_values_in_request(
     """Wait for multiple specified values in a response using different checkers.
 
     Args:
-        request (PreparedRequest | Response): The request or response to monitor for the
-            expected values.
+        request (PreparedRequest | Request | Response): The request or response to
+            monitor for the expected values.
         checkers (list[dict[str, Any]]): A list of dictionaries, where each dictionary
             contains information about a checker to apply.
             Each dictionary must have keys:

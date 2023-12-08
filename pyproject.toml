@@ -56,6 +56,7 @@ dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.11.1",
+    "responses>=0.24.1",
     "ruff>=0.0.282",
     "tox>=4.7.0",
     "twine>=4.0.2"
@@ -82,7 +83,7 @@ namespaces = false
 
 [tool.pytest.ini_options]
 addopts = "--durations=2"
-log_cli = false
+log_cli = true
 log_cli_level = "debug"
 markers = "e2e: end-to-end tests"
 

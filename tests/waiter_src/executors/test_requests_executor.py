@@ -1,9 +1,12 @@
+import json
 from typing import Any, Callable
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from _pytest.logging import LogCaptureFixture
 from pytest_mock import MockerFixture
-from requests import PreparedRequest, RequestException, Response, Session
+from requests import PreparedRequest, Request, RequestException, Response, Session
+from responses import RequestsMock
 
 from bepatient.waiter_src.checker import Checker
 from bepatient.waiter_src.exceptions.executor_exceptions import ExecutorIsNotReady
@@ -11,15 +14,78 @@ from bepatient.waiter_src.executors.requests_executor import RequestsExecutor
 
 
 class TestRequestExecutor:
-    def test_executor_returns_true_for_expected_status_code(
+    def test_proper_headers_cookies_from_request(
         self,
-        prepared_request: PreparedRequest,
-        session_mock: Session,
+        mocked_responses: RequestsMock,
+        example_dict_content: dict[str, Any],
+        session_object: Session,
+        request_object: Request,
     ):
-        executor = RequestsExecutor(
-            prepared_request, expected_status_code=200, session=session_mock
+        res_mock = mocked_responses.get(
+            request_object.url,
+            status=200,
+            body=json.dumps(example_dict_content).encode("utf-8"),
         )
-        assert executor.is_condition_met() is True
+        executor = RequestsExecutor(
+            req_or_res=request_object,
+            expected_status_code=200,
+            session=session_object,
+        )
+        expected_request_headers = {
+            **session_object.headers,
+            **request_object.headers,
+            "Cookie": "pytest=fixture; user-token=abc-123",
+        }
+
+        assert executor.is_condition_met()
+        assert res_mock.call_count == 1
+        assert executor.get_result().json() == example_dict_content
+        assert executor.get_result().request.headers == expected_request_headers
+
+    @pytest.mark.parametrize(
+        "fixture_name, expected_cookies, additional_log",
+        [
+            (
+                "example_response",
+                {"Cookie": "user-token=abc-123; pytest=fixture"},
+                "PreparedRequest already has cookies.",
+            ),
+            ("response_without_cookies_in_request", {"Cookie": "pytest=fixture"}, None),
+        ],
+    )
+    def test_proper_headers_cookies_from_response(
+        self,
+        mocked_responses: RequestsMock,
+        request: FixtureRequest,
+        session_object: Session,
+        fixture_name: str,
+        expected_cookies: dict[str, str],
+        additional_log: str,
+        caplog: LogCaptureFixture,
+    ):
+        response = request.getfixturevalue(fixture_name)
+        res_mock = mocked_responses.get(
+            response.request.url,
+            status=200,
+        )
+        executor = RequestsExecutor(
+            req_or_res=response,
+            expected_status_code=200,
+            session=session_object,
+        )
+        expected_request_headers = {
+            **response.request.headers,
+            **session_object.headers,
+            **expected_cookies,
+        }
+
+        assert "Merging session.headers into PreparedRequest object" in caplog.text
+        assert "Merging session.cookies into PreparedRequest object" in caplog.text
+        if additional_log:
+            assert "PreparedRequest already has cookies" in caplog.text
+        assert executor.is_condition_met()
+        assert res_mock.call_count == 1
+        assert executor.get_result().request.headers == expected_request_headers
 
     def test_is_condition_met_returns_true_when_checker_pass(
         self,
@@ -31,7 +97,7 @@ class TestRequestExecutor:
             req_or_res=prepared_request, session=session_mock, expected_status_code=200
         ).add_checker(checker_true)
 
-        assert executor.is_condition_met() is True
+        assert executor.is_condition_met()
 
     def test_is_condition_met_returns_true_when_all_checkers_pass(
         self,
@@ -49,7 +115,7 @@ class TestRequestExecutor:
             .add_checker(checker_true)
         )
 
-        assert executor.is_condition_met() is True
+        assert executor.is_condition_met()
 
     def test_is_condition_met_returns_false_when_checker_fail(
         self,
@@ -85,11 +151,12 @@ class TestRequestExecutor:
     def test_is_condition_met_returns_false_when_status_code_check_fail(
         self,
         prepared_request: PreparedRequest,
+        example_response: Response,
         mocker: MockerFixture,
         checker_true: Checker,
     ):
         session = mocker.MagicMock()
-        response = mocker.MagicMock()
+        response = example_response
         response.status_code = 404
         session.send.return_value = response
         executor = RequestsExecutor(
@@ -109,58 +176,50 @@ class TestRequestExecutor:
         with pytest.raises(ExecutorIsNotReady, match=msg):
             executor.get_result()
 
-    def test_get_result_returns_response(
-        self,
-        prepared_request: PreparedRequest,
-        session_mock: Session,
-        dict_content_response: Response,
-        checker_true: Checker,
-    ):
-        executor = RequestsExecutor(
-            req_or_res=prepared_request, session=session_mock, expected_status_code=200
-        ).add_checker(checker_true)
-
-        executor.is_condition_met()
-        result = executor.get_result()
-
-        assert result == dict_content_response
-
     def test_error_message_returns_correct_message_status_checker(
         self,
-        prepared_request: PreparedRequest,
-        session_mock: Session,
+        mocked_responses: RequestsMock,
+        request_object: Request,
+        session_object: Session,
         checker_true: Checker,
     ):
+        mocked_responses.get(request_object.url, status=200)
         executor = RequestsExecutor(
-            req_or_res=prepared_request, session=session_mock, expected_status_code=404
+            req_or_res=request_object, session=session_object, expected_status_code=404
         ).add_checker(checker_true)
 
         executor.is_condition_met()
 
         assert executor.error_message() == (
             "The condition has not been met! | Failed checkers:"
-            " (Checker: StatusCodeChecker | Comparer: is_equal"
-            " | Expected_value: 404 | Data: 200)"
-            " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' "
-            "https://webludus.pl/"
+            " (Checker: StatusCodeChecker | Comparer: is_equal | Expected_value: 404"
+            " | Data: 200) | curl -X GET -H 'Content-Type: application/json'"
+            " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
+            " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101'"
+            " -H 'task: test' -H 'Cookie: pytest=fixture; user-token=abc-123'"
+            " https://webludus.pl/"
         )
 
     def test_error_message_returns_correct_message_normal_checker(
         self,
-        prepared_request: PreparedRequest,
-        session_mock: Session,
+        mocked_responses: RequestsMock,
+        request_object: Request,
+        session_object: Session,
         checker_false: Checker,
     ):
+        mocked_responses.get(request_object.url, status=200)
         executor = RequestsExecutor(
-            req_or_res=prepared_request, session=session_mock, expected_status_code=200
+            req_or_res=request_object, session=session_object, expected_status_code=200
         ).add_checker(checker_false)
 
         executor.is_condition_met()
 
         assert executor.error_message() == (
-            "The condition has not been met!"
-            " | Failed checkers: (I'm falsy) | curl -X GET -H 'task: test'"
-            " -H 'Cookie: user-token=abc-123' https://webludus.pl/"
+            "The condition has not been met! | Failed checkers: (I'm falsy)"
+            " | curl -X GET -H 'Content-Type: application/json' -H 'Accept-Language:"
+            " en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent: Mozilla/5.0"
+            " (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task: test'"
+            " -H 'Cookie: pytest=fixture; user-token=abc-123' https://webludus.pl/"
         )
 
     def test_error_message_returns_correct_message_multiple_checkers(
@@ -168,7 +227,7 @@ class TestRequestExecutor:
         prepared_request: PreparedRequest,
         session_mock: Session,
         checker_false: Checker,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
     ):
         class CheckerMocker(Checker):
             def __str__(self) -> str:
@@ -187,17 +246,16 @@ class TestRequestExecutor:
                 expected_status_code=200,
             )
             .add_checker(checker_false)
-            .add_checker(CheckerMocker(is_equal, ""))
+            .add_checker(CheckerMocker(is_equal_comparer, ""))
             .add_checker(checker_false)
         )
 
         executor.is_condition_met()
 
         assert executor.error_message() == (
-            "The condition has not been met!"
-            " | Failed checkers: (I'm falsy, I'm even more falsy, I'm falsy)"
-            " | curl -X GET -H 'task: test'"
-            " -H 'Cookie: user-token=abc-123' https://webludus.pl/"
+            "The condition has not been met! | Failed checkers:"
+            " (I'm falsy, I'm even more falsy, I'm falsy) | curl -X GET"
+            " -H 'task: test' -H 'Cookie: user-token=abc-123' https://webludus.pl/"
         )
 
     def test_error_message_raises_exception_when_condition_has_not_been_checked(
@@ -213,16 +271,19 @@ class TestRequestExecutor:
 
     def test_condition_met_error_message(
         self,
-        prepared_request: PreparedRequest,
-        session_mock: Session,
+        mocked_responses: RequestsMock,
+        request_object: Request,
+        session_object: Session,
         checker_true: Checker,
     ):
+        res_mock = mocked_responses.get(request_object.url, status=200)
         executor = RequestsExecutor(
-            req_or_res=prepared_request, session=session_mock, expected_status_code=200
+            req_or_res=request_object, session=session_object, expected_status_code=200
         ).add_checker(checker_true)
 
         executor.is_condition_met()
 
+        assert res_mock.call_count == 1
         assert executor.error_message() == "All conditions have been met."
 
     def test_except_request_exception(
@@ -276,58 +337,54 @@ class TestRequestExecutor:
 
     def test_response_headers_merged_into_session(
         self,
-        dict_content_response: Response,
+        example_response: Response,
         prepared_request: PreparedRequest,
         caplog: LogCaptureFixture,
     ):
-        dict_content_response.request = prepared_request
+        example_response.request = prepared_request
         session = Session()
         session.headers = {"test_name": "test_response_headers_merged_into_session"}
         expected_headers = session.headers | dict(prepared_request.headers)
         logs = [
             (
                 "bepatient.waiter_src.executors.requests_executor",
-                20,
-                "Merging response data into session",
+                10,
+                "Merging session.headers into PreparedRequest object",
             )
         ]
 
         executor = RequestsExecutor(
-            req_or_res=dict_content_response, expected_status_code=200, session=session
+            req_or_res=example_response, expected_status_code=200, session=session
         )
 
-        assert executor.session.headers == expected_headers
         assert caplog.record_tuples == logs
+        assert dict(executor.request.headers) == expected_headers
 
     def test_self_request_is_first_response_request(
-        self, dict_content_response: Response, prepared_request: PreparedRequest
+        self, example_response: Response, prepared_request: PreparedRequest
     ):
-        dict_content_response.request = prepared_request
-
         executor = RequestsExecutor(
-            req_or_res=dict_content_response, expected_status_code=200
+            req_or_res=example_response, expected_status_code=200
         )
 
         assert executor.request == prepared_request
 
     def test_self_request_is_first_request_from_history(
         self,
-        dict_content_response: Response,
-        headers_response: Response,
-        prepared_request: PreparedRequest,
+        example_response: Response,
     ):
-        additional_response = Response()
-        additional_response.request = prepared_request
-        dict_content_response.history = [additional_response, headers_response]
+        expected_request = PreparedRequest()
+        expected_request.prepare(method="get", url="https://example.com")
 
-        dict_content_response.request = PreparedRequest()
-        dict_content_response.request.prepare_headers({})
+        additional_response = Response()
+        additional_response.request = expected_request
+        example_response.history = [additional_response, example_response]
 
         executor = RequestsExecutor(
-            req_or_res=dict_content_response, expected_status_code=200
+            req_or_res=example_response, expected_status_code=200
         )
 
-        assert executor.request == prepared_request
+        assert executor.request == expected_request
 
     def test_set_5s_timeout_if_timeout_not_provided(self, prepared_request):
         executor = RequestsExecutor(

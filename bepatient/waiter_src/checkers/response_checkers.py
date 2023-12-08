@@ -89,12 +89,14 @@ class JsonChecker(Checker):
         Returns:
             Any: The prepared data for comparison."""
         try:
-            return dictor(
+            dictor_data = dictor(
                 self.parse_response(data, run_uuid),
                 self.path,
                 search=self.search_query,
                 default=self.dictor_fallback,
             )
+            log.info("Dictor data: %s", dictor_data)
+            return dictor_data
         except (TypeError, JSONDecodeError):
             log.exception(
                 "Check uuid: %s | Expected: %s | Headers: %s | Content %s",

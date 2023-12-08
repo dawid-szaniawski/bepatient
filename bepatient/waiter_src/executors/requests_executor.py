@@ -1,6 +1,6 @@
 import logging
 
-from requests import PreparedRequest, Response, Session
+from requests import PreparedRequest, Request, Response, Session
 from requests.exceptions import RequestException
 
 from bepatient.curler import Curler
@@ -21,7 +21,7 @@ class RequestsExecutor(Executor):
 
     def __init__(
         self,
-        req_or_res: PreparedRequest | Response,
+        req_or_res: Request | Response | PreparedRequest,
         expected_status_code: int,
         session: Session | None = None,
         timeout: int = 5,
@@ -36,18 +36,33 @@ class RequestsExecutor(Executor):
             log.info("Creating a new Session object")
             self.session = Session()
 
-        if isinstance(req_or_res, Response):
-            log.info("Merging response data into session")
-            self.session.headers.update(req_or_res.request.headers)
+        if isinstance(req_or_res, Request):
+            self.request = self.session.prepare_request(req_or_res)
+        elif isinstance(req_or_res, PreparedRequest):
+            self.request = req_or_res
+        else:
             self._result = req_or_res
-            if len(req_or_res.history) > 0:
+            if len(self._result.history) > 0:
                 self.request = req_or_res.history[0].request
             else:
                 self.request = req_or_res.request
-        else:
-            self.request = req_or_res
+            self._merge_session_data_to_prepared_request()
 
         self._input = Curler().to_curl(self.request)
+
+    def _merge_session_data_to_prepared_request(self):
+        log.debug("Merging session.headers into PreparedRequest object")
+        self.request.headers.update(self.session.headers)  # type: ignore
+        if self.session.cookies:
+            log.debug("Merging session.cookies into PreparedRequest object")
+            req_cookies = self.request.headers.get("Cookie", "")
+            if req_cookies:
+                log.debug("PreparedRequest already has cookies")
+                req_cookies = req_cookies + "; "
+            session_cookies = "; ".join(
+                f"{k}={v}" for k, v in self.session.cookies.items()
+            )
+            self.request.headers["Cookie"] = req_cookies + session_cookies
 
     def is_condition_met(self) -> bool:
         """Sends the request and check if all checkers pass or timeout occurs.
@@ -59,8 +74,9 @@ class RequestsExecutor(Executor):
             ExecutorIsNotReady: If the executor is not ready to send the request."""
         try:
             self._result = self.session.send(request=self.request, timeout=self.timeout)
+            log.debug("Sent: %s", Curler().to_curl(self._result))
         except RequestException:
-            log.exception("RequestException! CURL: %s", Curler().to_curl(self.request))
+            log.exception("RequestException! CURL: %s", self._input)
             return False
 
         if self._status_code_checker.check(self._result):
