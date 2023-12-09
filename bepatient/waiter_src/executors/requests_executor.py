@@ -33,7 +33,7 @@ class RequestsExecutor(Executor):
         if session:
             self.session = session
         else:
-            log.info("Creating a new Session object")
+            log.debug("Creating a new Session object")
             self.session = Session()
 
         if isinstance(req_or_res, Request):
@@ -74,7 +74,7 @@ class RequestsExecutor(Executor):
             ExecutorIsNotReady: If the executor is not ready to send the request."""
         try:
             self._result = self.session.send(request=self.request, timeout=self.timeout)
-            log.debug("Sent: %s", Curler().to_curl(self._result))
+            log.info("Sent: %s", Curler().to_curl(self._result))
         except RequestException:
             log.exception("RequestException! CURL: %s", self._input)
             return False

@@ -327,7 +327,7 @@ class TestRequestExecutor:
         logs = [
             (
                 "bepatient.waiter_src.executors.requests_executor",
-                20,
+                10,
                 "Creating a new Session object",
             )
         ]

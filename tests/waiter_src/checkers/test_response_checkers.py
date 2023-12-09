@@ -57,7 +57,7 @@ class TestStatusCodeChecker:
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                20,
+                10,
                 "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
                 " | Comparer: comparer | Expected_value: 200 | Data: 200",
             ),
@@ -255,7 +255,7 @@ class TestJsonChecker:
         logs = [
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
+                10,
                 "Check uuid: None | Response content: b'{ \"name'",
             ),
             (
@@ -290,7 +290,7 @@ class TestJsonChecker:
         logs = [
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
+                10,
                 "Check uuid: None | Response content: b'{ \"name'",
             ),
             (
@@ -332,11 +332,11 @@ class TestHeadersChecker:
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                20,
+                10,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Path: server"
-                " | Search_query: None | Data: WebLudus.pl",
+                " | Expected_value: WebLudus.pl | Path: server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -348,7 +348,8 @@ class TestHeadersChecker:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Dictor data: WebLudus.pl",
+                "Check uuid: TestHeadersChecker | Dictor path: server"
+                " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
         ]
         assert checker.check(example_response) is True
@@ -378,26 +379,28 @@ class TestHeadersChecker:
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check uuid: TestHeadersChecker | Checker: HeadersChecker | Comparer: "
-                "comparer | Dictor_fallback: None | Expected_value: example.com"
-                " | Path: server | Search_query: None | Data: WebLudus.pl",
+                10,
+                "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
+                " | Comparer: comparer | Dictor_fallback: None"
+                " | Expected_value: example.com | Path: server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TestHeadersChecker | Response headers: {'Content-Language'"
-                ": 'en-US', 'Content-Type': 'application/json', 'server': 'WebLudus.pl'"
-                ", 'X-Render-Origin_Server': 'gunicorn'}",
+                "Check uuid: TestHeadersChecker | Response headers:"
+                " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
+                " 'server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Dictor data: WebLudus.pl",
+                "Check uuid: TestHeadersChecker | Dictor path: server"
+                " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checker",
-                10,
+                20,
                 "Check uuid: TestHeadersChecker | Condition not met"
                 " | Expected: example.com | Data: WebLudus.pl",
             ),

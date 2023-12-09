@@ -88,7 +88,6 @@ def example_response(
     return res
 
 
-# noinspection PyUnresolvedReferences
 @pytest.fixture
 def session_mock(
     mocker: MockerFixture,
@@ -101,7 +100,6 @@ def session_mock(
     return session
 
 
-# noinspection PyUnresolvedReferences
 @pytest.fixture
 def session_object(example_request_headers: dict[str, str | bytes]) -> Session:
     session = Session()
