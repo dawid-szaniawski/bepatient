@@ -46,10 +46,16 @@ class Checker(ABC):
         Returns:
             bool: True if the condition is met, False otherwise."""
         run_uuid = str(uuid.uuid4())
-        log.debug("Check uuid: %s | %s", run_uuid, self)
+        log.info("Check uuid: %s | %s", run_uuid, self)
 
         self._prepared_data = self.prepare_data(data, run_uuid)
         if self.comparer(self._prepared_data, self.expected_value):
+            log.info(
+                "Check success! | uuid: %s | Expected: %s | Prepared data: %s",
+                run_uuid,
+                self.expected_value,
+                self._prepared_data,
+            )
             return True
         log.info(
             "Check uuid: %s | Condition not met | Expected: %s | Data: %s",

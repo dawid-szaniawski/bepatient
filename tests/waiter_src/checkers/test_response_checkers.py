@@ -57,7 +57,7 @@ class TestStatusCodeChecker:
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                10,
+                20,
                 "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
                 " | Comparer: comparer | Expected_value: 200 | Data: 200",
             ),
@@ -69,6 +69,12 @@ class TestStatusCodeChecker:
                 ', {"name": "Mike", "age": 15}], "ok": true, "some_number": 123, "list"'
                 ': ["1", "2", "3"], "none": null, "empty": "", "false": false'
                 ', "name": "Jack"}\'',
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check success! | uuid: TestStatusCodeChecker | Expected: 200"
+                " | Prepared data: 200",
             ),
         ]
 
@@ -332,7 +338,7 @@ class TestHeadersChecker:
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                10,
+                20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
                 " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
@@ -350,6 +356,12 @@ class TestHeadersChecker:
                 20,
                 "Check uuid: TestHeadersChecker | Dictor path: Server"
                 " | Dictor search: None | Dictor data: WebLudus.pl",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check success! | uuid: TestHeadersChecker | Expected: WebLudus.pl | "
+                "Prepared data: WebLudus.pl",
             ),
         ]
         assert checker.check(example_response) is True
@@ -379,7 +391,7 @@ class TestHeadersChecker:
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                10,
+                20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
                 " | Expected_value: example.com | Path: Server | Search_query: None"

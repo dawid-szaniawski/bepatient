@@ -22,13 +22,13 @@ def wait_for_executor(
         WaiterConditionWasNotMet: if the condition is not met within the specified
             number of attempts."""
     for attempt in range(retries):
-        log.debug(
+        log.info(
             "Checking whether the condition has been met. The %s approach", attempt + 1
         )
         if executor.is_condition_met():
-            log.debug("Condition met!")
+            log.info("Condition met!")
             return
-        log.debug("The condition has not been met. Waiting: %s", delay)
+        log.info("The condition has not been met. Waiting time: %s", delay)
         sleep(delay)
     if raise_error:
         raise WaiterConditionWasNotMet(executor.error_message())
