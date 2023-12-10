@@ -327,7 +327,7 @@ class TestHeadersChecker:
     ):
         monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
         checker = HeadersChecker(
-            comparer=is_equal_comparer, expected_value="WebLudus.pl", dict_path="server"
+            comparer=is_equal_comparer, expected_value="WebLudus.pl", dict_path="Server"
         )
         logs = [
             (
@@ -335,7 +335,7 @@ class TestHeadersChecker:
                 10,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Path: server | Search_query: None"
+                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
                 " | Data: WebLudus.pl",
             ),
             (
@@ -343,12 +343,12 @@ class TestHeadersChecker:
                 20,
                 "Check uuid: TestHeadersChecker | Response headers:"
                 " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
-                " 'server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
+                " 'Server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TestHeadersChecker | Dictor path: server"
+                "Check uuid: TestHeadersChecker | Dictor path: Server"
                 " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
         ]
@@ -374,7 +374,7 @@ class TestHeadersChecker:
     ):
         monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
         checker = HeadersChecker(
-            comparer=is_equal_comparer, expected_value="example.com", dict_path="server"
+            comparer=is_equal_comparer, expected_value="example.com", dict_path="Server"
         )
         logs = [
             (
@@ -382,7 +382,7 @@ class TestHeadersChecker:
                 10,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: example.com | Path: server | Search_query: None"
+                " | Expected_value: example.com | Path: Server | Search_query: None"
                 " | Data: WebLudus.pl",
             ),
             (
@@ -390,12 +390,12 @@ class TestHeadersChecker:
                 20,
                 "Check uuid: TestHeadersChecker | Response headers:"
                 " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
-                " 'server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
+                " 'Server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TestHeadersChecker | Dictor path: server"
+                "Check uuid: TestHeadersChecker | Dictor path: Server"
                 " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
             (

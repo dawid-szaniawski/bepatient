@@ -22,7 +22,7 @@ def example_response_headers() -> CaseInsensitiveDict[str]:
     headers: CaseInsensitiveDict[str] = CaseInsensitiveDict()
     headers["Content-Language"] = "en-US"
     headers["Content-Type"] = "application/json"
-    headers["server"] = "WebLudus.pl"
+    headers["Server"] = "WebLudus.pl"
     headers["X-Render-Origin_Server"] = "gunicorn"
     return headers
 

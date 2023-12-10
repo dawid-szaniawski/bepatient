@@ -343,7 +343,7 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
                 "Check uuid: C | Response headers: {'Content-Language': 'en-US', "
-                "'Content-Type': 'application/json', 'server': 'WebLudus.pl', "
+                "'Content-Type': 'application/json', 'Server': 'WebLudus.pl', "
                 "'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
@@ -378,7 +378,7 @@ class TestRequestsWaiter:
     ):
         waiter = RequestsWaiter(request=prepared_request, session=session_mock)
         checker = HeadersChecker(
-            comparer=isinstance, expected_value=str, dict_path="server"
+            comparer=isinstance, expected_value=str, dict_path="Server"
         )
         waiter.add_custom_checker(checker)
         response = waiter.run(retries=1).get_result()
@@ -460,7 +460,7 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checker",
                 10,
                 "Check uuid: TEST2 | Checker: HeadersChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: WebLudus.pl | Path: server"
+                " | Dictor_fallback: None | Expected_value: WebLudus.pl | Path: Server"
                 " | Search_query: None | Data: WebLudus.pl",
             ),
             (
@@ -471,7 +471,7 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TEST2 | Dictor path: server | Dictor search: None"
+                "Check uuid: TEST2 | Dictor path: Server | Dictor search: None"
                 " | Dictor data: None",
             ),
             (
@@ -514,20 +514,20 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checker",
                 10,
                 "Check uuid: TEST4 | Checker: HeadersChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: WebLudus.pl | Path: server"
+                " | Dictor_fallback: None | Expected_value: WebLudus.pl | Path: Server"
                 " | Search_query: None | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
                 "Check uuid: TEST4 | Response headers: {'Content-Language': 'en-US', "
-                "'Content-Type': 'application/json', 'server': 'WebLudus.pl', "
+                "'Content-Type': 'application/json', 'Server': 'WebLudus.pl', "
                 "'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: TEST4 | Dictor path: server | Dictor search: None"
+                "Check uuid: TEST4 | Dictor path: Server | Dictor search: None"
                 " | Dictor data: WebLudus.pl",
             ),
             ("bepatient.waiter_src.waiter", 10, "Condition met!"),
@@ -538,7 +538,7 @@ class TestRequestsWaiter:
             expected_value="WebLudus.pl",
             comparer="is_equal",
             checker="headers_checker",
-            dict_path="server",
+            dict_path="Server",
         )
         waiter.run(retries=2)
 

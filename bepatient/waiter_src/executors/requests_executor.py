@@ -74,7 +74,8 @@ class RequestsExecutor(Executor):
             ExecutorIsNotReady: If the executor is not ready to send the request."""
         try:
             self._result = self.session.send(request=self.request, timeout=self.timeout)
-            log.info("Sent: %s", Curler().to_curl(self._result))
+            self._input = Curler().to_curl(self._result)
+            log.info("Sent: %s", self._input)
         except RequestException:
             log.exception("RequestException! CURL: %s", self._input)
             return False
