@@ -1,12 +1,13 @@
 from typing import Any, Callable
 
 import pytest
+from requests import Response
 
 from bepatient.waiter_src.checker import Checker
 
 
 @pytest.fixture
-def checker_true(is_equal: Callable[[Any, Any], bool]) -> Checker:
+def checker_true(is_equal_comparer: Callable[[Any, Any], bool]) -> Checker:
     class CheckerMocker(Checker):
         def __str__(self) -> str:
             return "I'm truthy"
@@ -17,13 +18,13 @@ def checker_true(is_equal: Callable[[Any, Any], bool]) -> Checker:
         def check(self, data: Any) -> bool:
             return True
 
-    checker = CheckerMocker(is_equal, "")
+    checker = CheckerMocker(comparer=is_equal_comparer, expected_value="")
     assert str(checker) == "I'm truthy"
     return checker
 
 
 @pytest.fixture
-def checker_false(is_equal: Callable[[Any, Any], bool]) -> Checker:
+def checker_false(is_equal_comparer: Callable[[Any, Any], bool]) -> Checker:
     class CheckerMocker(Checker):
         def __str__(self) -> str:
             return "I'm falsy"
@@ -34,4 +35,10 @@ def checker_false(is_equal: Callable[[Any, Any], bool]) -> Checker:
         def check(self, data: Any) -> bool:
             return False
 
-    return CheckerMocker(is_equal, "")
+    return CheckerMocker(comparer=is_equal_comparer, expected_value="")
+
+
+@pytest.fixture
+def response_without_cookies_in_request(example_response: Response) -> Response:
+    del example_response.request.headers["Cookie"]
+    return example_response

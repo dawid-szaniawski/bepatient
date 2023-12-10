@@ -14,8 +14,8 @@ from bepatient.waiter_src.checkers.response_checkers import (
 
 
 class TestStatusCodeChecker:
-    def test_str(self, is_equal: Callable[[Any, Any], bool]):
-        checker = StatusCodeChecker(is_equal, 5)
+    def test_str(self, is_equal_comparer: Callable[[Any, Any], bool]):
+        checker = StatusCodeChecker(is_equal_comparer, 5)
         msg = (
             "Checker: StatusCodeChecker | Comparer: comparer | "
             "Expected_value: 5 | Data: None"
@@ -25,35 +25,39 @@ class TestStatusCodeChecker:
 
     def test_prepare_data(
         self,
-        headers_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
         caplog: LogCaptureFixture,
     ):
-        checker = StatusCodeChecker(is_equal, 200)
+        checker = StatusCodeChecker(is_equal_comparer, 200)
         logs = [
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: None | Response status code: 200 | Response content: None",
+                "Check uuid: None | Response status code: 200 | Response content:"
+                ' b\'{"list_of_dicts": [{"name": "John", "age": 30},'
+                ' {"name": "Mike", "age": 15}], "ok": true, "some_number": 123,'
+                ' "list": ["1", "2", "3"], "none": null, "empty": "", "false": false,'
+                ' "name": "Jack"}\'',
             )
         ]
 
-        assert checker.prepare_data(headers_response) == 200
+        assert checker.prepare_data(example_response) == 200
         assert caplog.record_tuples == logs
 
     def test_check(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
         caplog: LogCaptureFixture,
         monkeypatch: pytest.MonkeyPatch,
     ):
-        checker = StatusCodeChecker(is_equal, 200)
+        checker = StatusCodeChecker(is_equal_comparer, 200)
         monkeypatch.setattr("uuid.uuid4", lambda: "TestStatusCodeChecker")
         logs = [
             (
                 "bepatient.waiter_src.checker",
-                20,
+                10,
                 "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
                 " | Comparer: comparer | Expected_value: 200 | Data: 200",
             ),
@@ -62,18 +66,19 @@ class TestStatusCodeChecker:
                 20,
                 "Check uuid: TestStatusCodeChecker | Response status code: 200"
                 ' | Response content: b\'{"list_of_dicts": [{"name": "John", "age": 30}'
-                ', {"name": "Mike", "age": 15}], "ok": true, "list": ["1", "2", "3"]'
-                ', "none": null, "empty": "", "false": false, "name": "Jack"}\'',
+                ', {"name": "Mike", "age": 15}], "ok": true, "some_number": 123, "list"'
+                ': ["1", "2", "3"], "none": null, "empty": "", "false": false'
+                ', "name": "Jack"}\'',
             ),
         ]
 
-        assert checker.check(dict_content_response) is True
+        assert checker.check(example_response) is True
         assert caplog.record_tuples == logs
 
 
 class TestJsonChecker:
-    def test_str(self, is_equal: Callable[[Any, Any], bool]):
-        checker = JsonChecker(is_equal, 5)
+    def test_str(self, is_equal_comparer: Callable[[Any, Any], bool]):
+        checker = JsonChecker(is_equal_comparer, 5)
         msg = (
             "Checker: JsonChecker | Comparer: comparer | Dictor_fallback: None |"
             " Expected_value: 5 | Path: None | Search_query: None | Data: None"
@@ -82,116 +87,161 @@ class TestJsonChecker:
         assert str(checker) == msg
 
     def test_dict(
-        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
-    ):
-        checker = JsonChecker(is_equal, True, dict_path="ok")
-        assert checker.check(dict_content_response) is True
-
-    def test_list(self, dict_content_response: Response):
-        checker = JsonChecker(lambda a, b: b in a, "2", dict_path="list")
-        assert checker.check(dict_content_response) is True
-
-    def test_longer_dict_path(self, dict_content_response: Response):
-        checker = JsonChecker(lambda a, b: a < b, 18, dict_path="list_of_dicts.1.age")
-        assert checker.check(dict_content_response) is True
-
-    def test_search_query(
-        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
+        self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
     ):
         checker = JsonChecker(
-            comparer=is_equal,
+            comparer=is_equal_comparer, expected_value=True, dict_path="ok"
+        )
+        assert checker.check(example_response) is True
+
+    def test_list(
+        self, contain_comparer: Callable[[Any, Any], bool], example_response: Response
+    ):
+        checker = JsonChecker(
+            comparer=contain_comparer, expected_value="2", dict_path="list"
+        )
+        assert checker.check(example_response) is True
+
+    def test_longer_dict_path(self, example_response: Response):
+        checker = JsonChecker(
+            comparer=lambda a, b: a < b,
+            expected_value=18,
+            dict_path="list_of_dicts.1.age",
+        )
+        assert checker.check(example_response) is True
+
+    def test_search_query(
+        self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
+    ):
+        checker = JsonChecker(
+            comparer=is_equal_comparer,
             expected_value=["John", "Mike"],
             dict_path="list_of_dicts",
             search_query="name",
         )
-        assert checker.check(dict_content_response) is True
+        assert checker.check(example_response) is True
 
-    def test_condition_not_met(self, dict_content_response: Response):
+    def test_condition_not_met(
+        self, contain_comparer: Callable[[Any, Any], bool], example_response: Response
+    ):
         checker = JsonChecker(
-            lambda a, b: b in a, "Joe", dict_path="list_of_dicts", search_query="name"
+            comparer=contain_comparer,
+            expected_value="Joe",
+            dict_path="list_of_dicts",
+            search_query="name",
         )
-        assert checker.check(dict_content_response) is False
+        assert checker.check(example_response) is False
 
     def test_missing_key(
-        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
+        self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
     ):
-        checker = JsonChecker(is_equal, "TEST", dict_path="status")
-        assert checker.check(dict_content_response) is False
+        checker = JsonChecker(
+            comparer=is_equal_comparer, expected_value="TEST", dict_path="status"
+        )
+        assert checker.check(example_response) is False
 
     def test_missing_in_search_query(
-        self, dict_content_response: Response, is_equal: Callable[[Any, Any], bool]
+        self,
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
-        checker = JsonChecker(is_equal, "TEST", search_query="name")
-        assert checker.check(dict_content_response) is False
+        checker = JsonChecker(
+            comparer=is_equal_comparer, expected_value="TEST", search_query="name"
+        )
+        assert checker.check(example_response) is False
 
     def test_null_value(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
-        checker = JsonChecker(is_equal, None, dict_path="none", dictor_fallback="Nope")
-        assert checker.prepare_data(dict_content_response) is None
+        checker = JsonChecker(
+            comparer=is_equal_comparer,
+            expected_value=None,
+            dict_path="none",
+            dictor_fallback="Nope",
+        )
+        assert checker.prepare_data(example_response) is None
 
     def test_empty_string_value(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
-        checker = JsonChecker(is_equal, None, dict_path="empty", dictor_fallback="Nope")
-        assert checker.prepare_data(dict_content_response) == ""
+        checker = JsonChecker(
+            comparer=is_equal_comparer,
+            expected_value=None,
+            dict_path="empty",
+            dictor_fallback="Nope",
+        )
+        assert checker.prepare_data(example_response) == ""
 
     def test_false_value(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
-        checker = JsonChecker(is_equal, None, dict_path="false", dictor_fallback="Nope")
-        assert checker.prepare_data(dict_content_response) is False
+        checker = JsonChecker(
+            comparer=is_equal_comparer,
+            expected_value=None,
+            dict_path="false",
+            dictor_fallback="Nope",
+        )
+        assert checker.prepare_data(example_response) is False
 
     def test_search_for_false_value(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
         checker = JsonChecker(
-            is_equal, None, search_query="false", dictor_fallback="Nope"
+            comparer=is_equal_comparer,
+            expected_value=None,
+            search_query="false",
+            dictor_fallback="Nope",
         )
-        assert checker.prepare_data(dict_content_response) == [False]
+        assert checker.prepare_data(example_response) == [False]
 
     @pytest.mark.xfail(reason="The dictor library bug")
     def test_search_for_null_value(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
         checker = JsonChecker(
-            is_equal, None, search_query="none", dictor_fallback="Nope"
+            comparer=is_equal_comparer,
+            expected_value=None,
+            search_query="none",
+            dictor_fallback="Nope",
         )
-        assert checker.prepare_data(dict_content_response) == [None]
+        assert checker.prepare_data(example_response) == [None]
 
     def test_search_for_empty_string_value(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
         checker = JsonChecker(
-            is_equal, None, search_query="empty", dictor_fallback="Nope"
+            comparer=is_equal_comparer,
+            expected_value=None,
+            search_query="empty",
+            dictor_fallback="Nope",
         )
-        assert checker.prepare_data(dict_content_response) == [""]
+        assert checker.prepare_data(example_response) == [""]
 
     def test_search_for_nested_value_without_path(
         self,
-        dict_content_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
     ):
-        checker = JsonChecker(is_equal, None, search_query="name")
-        assert checker.prepare_data(dict_content_response) == ["John", "Mike", "Jack"]
+        checker = JsonChecker(is_equal_comparer, None, search_query="name")
+        assert checker.prepare_data(example_response) == ["John", "Mike", "Jack"]
 
     def test_prepare_data_catch_json_decode_error(
         self,
         mocker: MockerFixture,
         caplog: LogCaptureFixture,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
     ):
         def json_mock():
             raise JSONDecodeError("", "", 1)
@@ -205,7 +255,7 @@ class TestJsonChecker:
         logs = [
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
+                10,
                 "Check uuid: None | Response content: b'{ \"name'",
             ),
             (
@@ -216,7 +266,9 @@ class TestJsonChecker:
             ),
         ]
 
-        data = JsonChecker(is_equal, "TEST", search_query="name").prepare_data(response)
+        data = JsonChecker(
+            comparer=is_equal_comparer, expected_value="TEST", search_query="name"
+        ).prepare_data(response)
         assert data is None
         assert caplog.record_tuples == logs
 
@@ -224,7 +276,7 @@ class TestJsonChecker:
         self,
         mocker: MockerFixture,
         caplog: LogCaptureFixture,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
     ):
         def json_mock():
             raise TypeError("", "", 1)
@@ -238,7 +290,7 @@ class TestJsonChecker:
         logs = [
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
+                10,
                 "Check uuid: None | Response content: b'{ \"name'",
             ),
             (
@@ -249,14 +301,16 @@ class TestJsonChecker:
             ),
         ]
 
-        data = JsonChecker(is_equal, "TEST", search_query="name").prepare_data(response)
+        data = JsonChecker(
+            comparer=is_equal_comparer, expected_value="TEST", search_query="name"
+        ).prepare_data(response)
         assert data is None
         assert caplog.record_tuples == logs
 
 
 class TestHeadersChecker:
-    def test_str(self, is_equal: Callable[[Any, Any], bool]):
-        checker = HeadersChecker(is_equal, 5)
+    def test_str(self, is_equal_comparer: Callable[[Any, Any], bool]):
+        checker = HeadersChecker(is_equal_comparer, 5)
         msg = (
             "Checker: HeadersChecker | Comparer: comparer | Dictor_fallback: None |"
             " Expected_value: 5 | Path: None | Search_query: None | Data: None"
@@ -266,81 +320,106 @@ class TestHeadersChecker:
 
     def test_dict(
         self,
-        headers_response: Response,
-        is_equal: Callable[[Any, Any], bool],
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
         caplog: LogCaptureFixture,
         monkeypatch: pytest.MonkeyPatch,
     ):
         monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
-        checker = HeadersChecker(is_equal, "John", dict_path="name")
-        logs = [
-            (
-                "bepatient.waiter_src.checker",
-                20,
-                "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
-                " | Comparer: comparer | Dictor_fallback: None | Expected_value: John"
-                " | Path: name | Search_query: None | Data: John",
-            ),
-            (
-                "bepatient.waiter_src.checkers.response_checkers",
-                20,
-                "Check uuid: TestHeadersChecker | Response headers: "
-                "{'name': 'John', 'age': '30', 'list': \"['1', '2', '3']\"}",
-            ),
-        ]
-        assert checker.check(headers_response) is True
-        assert caplog.record_tuples == logs
-
-    def test_search_query(
-        self, headers_response: Response, is_equal: Callable[[Any, Any], bool]
-    ):
         checker = HeadersChecker(
-            comparer=is_equal, expected_value=["['1', '2', '3']"], search_query="list"
+            comparer=is_equal_comparer, expected_value="WebLudus.pl", dict_path="Server"
         )
-        assert checker.check(headers_response) is True
-
-    def test_condition_not_met(
-        self,
-        headers_response: Response,
-        is_equal: Callable[[Any, Any], bool],
-        caplog: LogCaptureFixture,
-        monkeypatch: pytest.MonkeyPatch,
-    ):
-        monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
-        checker = HeadersChecker(is_equal, "Joe", dict_path="name")
         logs = [
-            (
-                "bepatient.waiter_src.checker",
-                20,
-                "Check uuid: TestHeadersChecker | Checker: HeadersChecker | Comparer: "
-                "comparer | Dictor_fallback: None | Expected_value: Joe | Path: name | "
-                "Search_query: None | Data: John",
-            ),
-            (
-                "bepatient.waiter_src.checkers.response_checkers",
-                20,
-                "Check uuid: TestHeadersChecker |"
-                " Response headers: {'name': 'John', 'age': '30', "
-                "'list': \"['1', '2', '3']\"}",
-            ),
             (
                 "bepatient.waiter_src.checker",
                 10,
-                "Check uuid: TestHeadersChecker | Condition not met"
-                " | Expected: Joe | Data: John",
+                "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
+                " | Comparer: comparer | Dictor_fallback: None"
+                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TestHeadersChecker | Response headers:"
+                " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
+                " 'Server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TestHeadersChecker | Dictor path: Server"
+                " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
         ]
-        assert checker.check(headers_response) is False
+        assert checker.check(example_response) is True
+        assert caplog.record_tuples == logs
+
+    def test_search_query(
+        self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
+    ) -> None:
+        checker = HeadersChecker(
+            comparer=is_equal_comparer,
+            expected_value=["application/json"],
+            search_query="Content-Type",
+        )
+        assert checker.check(example_response) is True
+
+    def test_condition_not_met(
+        self,
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
+        caplog: LogCaptureFixture,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
+        checker = HeadersChecker(
+            comparer=is_equal_comparer, expected_value="example.com", dict_path="Server"
+        )
+        logs = [
+            (
+                "bepatient.waiter_src.checker",
+                10,
+                "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
+                " | Comparer: comparer | Dictor_fallback: None"
+                " | Expected_value: example.com | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TestHeadersChecker | Response headers:"
+                " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
+                " 'Server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                20,
+                "Check uuid: TestHeadersChecker | Dictor path: Server"
+                " | Dictor search: None | Dictor data: WebLudus.pl",
+            ),
+            (
+                "bepatient.waiter_src.checker",
+                20,
+                "Check uuid: TestHeadersChecker | Condition not met"
+                " | Expected: example.com | Data: WebLudus.pl",
+            ),
+        ]
+        assert checker.check(example_response) is False
         assert caplog.record_tuples == logs
 
     def test_missing_key(
-        self, headers_response: Response, is_equal: Callable[[Any, Any], bool]
+        self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
     ):
-        checker = HeadersChecker(is_equal, "TEST", dict_path="status")
-        assert checker.check(headers_response) is False
+        checker = HeadersChecker(
+            comparer=is_equal_comparer, expected_value="TEST", dict_path="status"
+        )
+        assert checker.check(example_response) is False
 
     def test_missing_in_search_query(
-        self, headers_response: Response, is_equal: Callable[[Any, Any], bool]
+        self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
     ):
-        checker = HeadersChecker(is_equal, "TEST", search_query="name")
-        assert checker.check(headers_response) is False
+        checker = HeadersChecker(
+            comparer=is_equal_comparer, expected_value="TEST", search_query="name"
+        )
+        assert checker.check(example_response) is False

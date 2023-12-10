@@ -76,7 +76,7 @@ class JsonChecker(Checker):
 
         Returns:
             dict[str, Any] | list[Any]: The parsed JSON response data for comparison."""
-        log.info("Check uuid: %s | Response content: %s", run_uuid, data.content)
+        log.debug("Check uuid: %s | Response content: %s", run_uuid, data.content)
         return data.json()
 
     def prepare_data(self, data: Response, run_uuid: str | None = None) -> Any:
@@ -89,12 +89,21 @@ class JsonChecker(Checker):
         Returns:
             Any: The prepared data for comparison."""
         try:
-            return dictor(
-                self.parse_response(data, run_uuid),
-                self.path,
+            dictor_data = dictor(
+                data=self.parse_response(data, run_uuid),
+                path=self.path,
                 search=self.search_query,
                 default=self.dictor_fallback,
             )
+            log.info(
+                "Check uuid: %s | Dictor path: %s"
+                " | Dictor search: %s | Dictor data: %s",
+                run_uuid,
+                self.path,
+                self.search_query,
+                dictor_data,
+            )
+            return dictor_data
         except (TypeError, JSONDecodeError):
             log.exception(
                 "Check uuid: %s | Expected: %s | Headers: %s | Content %s",

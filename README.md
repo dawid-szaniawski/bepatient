@@ -9,8 +9,9 @@
 
 # Be Patient
 
-_bepatient_ is a library aimed at facilitating work with asynchronous applications. It 
-allows for the repeated execution of specific actions until the desired effect is achieved.
+_bepatient_ is a library aimed at facilitating work with asynchronous applications. It
+allows for the repeated execution of specific actions until the desired effect is
+achieved.
 
 ## Features
 
@@ -40,7 +41,6 @@ from requests import get
 
 from bepatient import RequestsWaiter
 
-
 waiter = RequestsWaiter(request=get("https://example.com/api"))
 waiter.add_checker(comparer="contain", expected_value="string")
 waiter.run()
@@ -57,7 +57,6 @@ from requests import get
 
 from bepatient import wait_for_value_in_request
 
-
 response = wait_for_value_in_request(
     request=get("https://example.com/api"),
     comparer="contain",
@@ -72,7 +71,6 @@ If we need add more than one checker:
 from requests import get
 
 from bepatient import wait_for_values_in_request
-
 
 list_of_checkers = [
     {

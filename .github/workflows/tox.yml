@@ -1,5 +1,5 @@
 name: Tests
-on: [push, pull_request]
+on: [ push, pull_request ]
 jobs:
   Linters:
     runs-on: ubuntu-latest
@@ -14,13 +14,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox
       - name: Run linters with Tox
-        run: tox -e flake8,mypy,pylint,ruff
+        run: tox -e black,flake8,isort,mypy,pylint,ruff
   Tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ['3.10', '3.11', '3.12']
+        os: [ ubuntu-latest, windows-latest ]
+        python-version: [ '3.10', '3.11', '3.12' ]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
