@@ -13,7 +13,7 @@ from .waiter_src.checker import Checker
 from .waiter_src.checkers import CHECKERS
 from .waiter_src.comparators import COMPARATORS
 
-__version__ = "0.8.0"
+__version__ = "0.8.1"
 __all__ = [
     "Checker",
     "CHECKERS",

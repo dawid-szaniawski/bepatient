@@ -116,7 +116,8 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: 1 | Condition not met | Expected: 200 | Data: 404",
+                "Check uuid: 1 | Condition not met | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.waiter",
@@ -150,8 +151,9 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: 2 | Expected: 200 | Prepared data: 200",
+                10,
+                "Check success! | uuid: 2 | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -168,13 +170,15 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 40,
-                "Check uuid: 3 | Expected: Jack | Headers: {'Content-Type':"
-                " 'text/plain'} | Content b''",
+                "Check uuid: 3 | Expected: Jack"
+                " | Headers: {'Content-Type': 'text/plain'} | Content b''",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: 3 | Condition not met | Expected: Jack | Data: None",
+                "Check uuid: 3 | Condition not met | Checker: JsonChecker"
+                " | Comparer: is_equal | Dictor_fallback: None | Expected_value: Jack"
+                " | Path: name | Search_query: None | Data: Jack",
             ),
             (
                 "bepatient.waiter_src.waiter",
@@ -211,8 +215,9 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: 4 | Expected: 200 | Prepared data: 200",
+                10,
+                "Check success! | uuid: 4 | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -237,8 +242,10 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: 5 | Expected: Jack | Prepared data: Jack",
+                10,
+                "Check success! | uuid: 5 | Checker: JsonChecker | Comparer: is_equal"
+                " | Dictor_fallback: None | Expected_value: Jack | Path: name"
+                " | Search_query: None | Data: Jack",
             ),
             ("bepatient.waiter_src.waiter", 20, "Condition met!"),
         ]
@@ -312,7 +319,8 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: A | Condition not met | Expected: 200 | Data: 404",
+                "Check uuid: A | Condition not met | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.waiter",
@@ -327,8 +335,8 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
-                "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123; "
-                "pytest=fixture' -H 'Content-Type: application/json'"
+                "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123;"
+                " pytest=fixture' -H 'Content-Type: application/json'"
                 " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
                 " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0)"
                 " Gecko/20100101' https://webludus.pl/",
@@ -349,22 +357,23 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: B | Expected: 200 | Prepared data: 200",
+                10,
+                "Check success! | uuid: B | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: C | Checker: HeadersChecker | Comparer: is_equal | "
-                "Dictor_fallback: None | Expected_value: gunicorn | Path: "
-                "X-Render-Origin_Server | Search_query: None | Data: gunicorn",
+                "Check uuid: C | Checker: HeadersChecker | Comparer: is_equal"
+                " | Dictor_fallback: None | Expected_value: gunicorn"
+                " | Path: X-Render-Origin_Server | Search_query: None | Data: gunicorn",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: C | Response headers: {'Content-Language': 'en-US', "
-                "'Content-Type': 'application/json', 'Server': 'WebLudus.pl', "
-                "'X-Render-Origin_Server': 'gunicorn'}",
+                "Check uuid: C | Response headers: {'Content-Language': 'en-US',"
+                " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
+                " 'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -374,9 +383,11 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: C | Expected: gunicorn"
-                " | Prepared data: gunicorn",
+                10,
+                "Check success! | uuid: C | Checker: HeadersChecker"
+                " | Comparer: is_equal | Dictor_fallback: None"
+                " | Expected_value: gunicorn | Path: X-Render-Origin_Server"
+                " | Search_query: None | Data: gunicorn",
             ),
             ("bepatient.waiter_src.waiter", 20, "Condition met!"),
         ]
@@ -484,8 +495,9 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: TEST1 | Expected: 200 | Prepared data: 200",
+                10,
+                "Check success! | uuid: TEST1 | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -508,8 +520,10 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: TEST2 | Condition not met | Expected: WebLudus.pl"
-                " | Data: None",
+                "Check uuid: TEST2 | Condition not met | Checker: HeadersChecker"
+                " | Comparer: is_equal | Dictor_fallback: None"
+                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.waiter",
@@ -543,8 +557,9 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: TEST3 | Expected: 200 | Prepared data: 200",
+                10,
+                "Check success! | uuid: TEST3 | Checker: StatusCodeChecker"
+                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -568,9 +583,11 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: TEST4 | Expected: WebLudus.pl"
-                " | Prepared data: WebLudus.pl",
+                10,
+                "Check success! | uuid: TEST4 | Checker: HeadersChecker"
+                " | Comparer: is_equal | Dictor_fallback: None"
+                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             ("bepatient.waiter_src.waiter", 20, "Condition met!"),
         ]

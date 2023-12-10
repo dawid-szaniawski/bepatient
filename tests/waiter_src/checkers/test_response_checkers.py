@@ -72,9 +72,10 @@ class TestStatusCodeChecker:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: TestStatusCodeChecker | Expected: 200"
-                " | Prepared data: 200",
+                10,
+                "Check success! | uuid: TestStatusCodeChecker"
+                " | Checker: StatusCodeChecker | Comparer: comparer"
+                " | Expected_value: 200 | Data: 200",
             ),
         ]
 
@@ -359,9 +360,11 @@ class TestHeadersChecker:
             ),
             (
                 "bepatient.waiter_src.checker",
-                20,
-                "Check success! | uuid: TestHeadersChecker | Expected: WebLudus.pl | "
-                "Prepared data: WebLudus.pl",
+                10,
+                "Check success! | uuid: TestHeadersChecker | Checker: HeadersChecker"
+                " | Comparer: comparer | Dictor_fallback: None"
+                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
         ]
         assert checker.check(example_response) is True
@@ -414,7 +417,9 @@ class TestHeadersChecker:
                 "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: TestHeadersChecker | Condition not met"
-                " | Expected: example.com | Data: WebLudus.pl",
+                " | Checker: HeadersChecker | Comparer: comparer"
+                " | Dictor_fallback: None | Expected_value: example.com"
+                " | Path: Server | Search_query: None | Data: WebLudus.pl",
             ),
         ]
         assert checker.check(example_response) is False
