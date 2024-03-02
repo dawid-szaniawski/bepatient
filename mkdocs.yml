@@ -38,7 +38,7 @@ theme:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/dawid-szaniawski
+      link: https://github.com/dawid-szaniawski/bepatient
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/bepatient
 

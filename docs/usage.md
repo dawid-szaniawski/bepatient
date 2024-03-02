@@ -30,23 +30,23 @@ Waits for a specified value in response.
 
 - request `(PreparedRequest | Request | Response)`: the request or response to monitor
   for the expected value.
-- status_code `(int, optional)`: the expected HTTP status code. Defaults to 200.
+- status_code `(int, optional)`: the expected HTTP status code. Defaults to `200`.
 - comparer `(COMPARATORS | None, optional)`: the comparer function or operator used for
-  value comparison. Defaults to None.
+  value comparison. Defaults to `None`.
 - expected_value `(Any, optional)`: the value to be compared against the response data.
-  Defaults to None.
+  Defaults to `None`.
 - checker `(CHECKERS, optional)`: the type of checker to use.
 - session `(Session | None, optional)`: the requests session to use for sending
-  requests. Defaults to None.
+  requests. Defaults to `None`.
 - dict_path `(str | None, optional)`: the dot-separated path to the value in the
-  response data. Defaults to None.
+  response data. Defaults to `None`.
 - search_query `(str | None, optional)`: a search query to use to find the value in the
-  response data. Defaults to None.
-- retries `(int, optional)`: the number of retries to perform. Defaults to 60.
-- delay `(int, optional)`: the delay between retries in seconds. Defaults to 1.
+  response data. Defaults to `None`.
+- retries `(int, optional)`: the number of retries to perform. Defaults to `60`.
+- delay `(int, optional)`: the delay between retries in seconds. Defaults to `1`.
 - req_timeout `(int | tuple[int, int] | None, optional)`: request timeout in seconds.
-  Default value is 15 for connect and 30 for read (15, 30). If user provide one value,
-  it will be applied to both - connect and read timeouts.
+  Default value is `15` for `connect` and `30` for `read`. If user provide one value,
+  it will be applied to both - `connect` and `read` timeouts.
 
 ##### Returns:
 
@@ -89,16 +89,19 @@ Wait for multiple specified values in a response using different checkers.
     * comparer `(COMPARATORS)`: comparer function or operator used for value comparison.
     * expected_value `(Any)`: the value to be compared against the response data.
     * dict_path `(str | None, optional)`: the dot-separated path to the value in the
-      response data. Defaults to None.
+      response data. Defaults to `None`.
     * search_query `(str | None, optional)`: a search query to use to find the value in
-      the response data. Defaults to None.
+      the response data. Defaults to `None`.
     * ignore_case `(bool, optional)`: If set, upper/lower-case keys in `dict_path` are
-      treated the same. Defaults to False.
-- status_code `(int, optional)`: the expected HTTP status code. Defaults to 200.
+      treated the same. Defaults to `False`.
+- status_code `(int, optional)`: the expected HTTP status code. Defaults to `200`.
 - session `(Session | None, optional)`: the requests session to use for sending
-  requests. Defaults to None.
-- retries `(int, optional)`: the number of retries to perform. Defaults to 60.
-- delay `(int, optional)`: the delay between retries in seconds. Defaults to 1.
+  requests. Defaults to `None`.
+- retries `(int, optional)`: the number of retries to perform. Defaults to `60`.
+- delay `(int, optional)`: the delay between retries in seconds. Defaults to `1`.
+- req_timeout `(int | tuple[int, int] | None, optional)`: request timeout in seconds.
+  Default value is 15 for `connect` and 30 for `read`. If user provide one value, it
+  will be applied to both - `connect` and `read` timeouts.
 
 ##### Returns:
 
@@ -142,10 +145,12 @@ When creating a RequestsWaiter object, one attribute is required:
 
 Additionally, the user can also specify:
 
-- status_code `(int, optional)`: the expected HTTP status code. Defaults to 200.
+- status_code `(int, optional)`: the expected HTTP status code. Defaults to `200`.
 - session `(Session | None, optional)`: the requests session to use for sending
-  requests. Defaults to None.
-- timeout `(int | None, optional)`: request timeout in seconds. Defaults to 5 seconds.
+  requests. Defaults to `None`.
+- timeout `(int | tuple[int, int] | None, optional)`: request timeout in seconds.
+  Default value is `15` for `connect` and `30` for `read`. If user provide one
+  value, it will be applied to both - `connect` and `read` timeouts.
 
 #### Methods
 
@@ -157,14 +162,14 @@ Add a response checker to the waiter.
 
 - expected_value `(Any)`: the value to be compared against the response data.
 - comparer `(COMPARATORS)`: the comparer function or operator used for value comparison.
-- checker `(CHECKERS, optional)`: the type of checker to use. Defaults to "
-  json_checker".
+- checker `(CHECKERS, optional)`: the type of checker to use. Defaults
+  to `json_checker`.
 - dict_path `(str | None, optional)`: the dot-separated path to the value in the
-  response data. Defaults to None.
+  response data. Defaults to `None`.
 - search_query `(str | None, optional)`: a search query to use to find the value in the
-  response data. Defaults to None.
+  response data. Defaults to `None`.
 - ignore_case `(bool, optional)`: If set, upper/lower-case keys in `dict_path` are
-  treated the same. Defaults to False.
+  treated the same. Defaults to `False`.
 
 ###### Returns:
 
@@ -173,7 +178,7 @@ Add a response checker to the waiter.
 ##### add_custom_checker
 
 This method allows users to add their own custom response checker by providing an
-object that inherits from the abstract base class Checker.
+object that inherits from the abstract base class `Checker`.
 
 ###### Args:
 
