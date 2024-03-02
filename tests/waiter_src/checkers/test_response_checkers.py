@@ -38,7 +38,7 @@ class TestStatusCodeChecker:
                 ' b\'{"list_of_dicts": [{"name": "John", "age": 30},'
                 ' {"name": "Mike", "age": 15}], "ok": true, "some_number": 123,'
                 ' "list": ["1", "2", "3"], "none": null, "empty": "", "false": false,'
-                ' "name": "Jack"}\'',
+                ' "name": "Jack", "City": "Cracow"}\'',
             )
         ]
 
@@ -68,7 +68,7 @@ class TestStatusCodeChecker:
                 ' | Response content: b\'{"list_of_dicts": [{"name": "John", "age": 30}'
                 ', {"name": "Mike", "age": 15}], "ok": true, "some_number": 123, "list"'
                 ': ["1", "2", "3"], "none": null, "empty": "", "false": false'
-                ', "name": "Jack"}\'',
+                ', "name": "Jack", "City": "Cracow"}\'',
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -87,8 +87,9 @@ class TestJsonChecker:
     def test_str(self, is_equal_comparer: Callable[[Any, Any], bool]):
         checker = JsonChecker(is_equal_comparer, 5)
         msg = (
-            "Checker: JsonChecker | Comparer: comparer | Dictor_fallback: None |"
-            " Expected_value: 5 | Path: None | Search_query: None | Data: None"
+            "Checker: JsonChecker | Comparer: comparer | Dictor_fallback: None"
+            " | Expected_value: 5 | Ignore_case: False | Path: None"
+            " | Search_query: None | Data: None"
         )
 
         assert str(checker) == msg
@@ -241,7 +242,11 @@ class TestJsonChecker:
         is_equal_comparer: Callable[[Any, Any], bool],
         example_response: Response,
     ):
-        checker = JsonChecker(is_equal_comparer, None, search_query="name")
+        checker = JsonChecker(
+            comparer=is_equal_comparer,
+            expected_value=None,
+            search_query="name",
+        )
         assert checker.prepare_data(example_response) == ["John", "Mike", "Jack"]
 
     def test_prepare_data_catch_json_decode_error(
@@ -314,13 +319,32 @@ class TestJsonChecker:
         assert data is None
         assert caplog.record_tuples == logs
 
+    @pytest.mark.parametrize(
+        "ignore_case,expected_value", [(False, None), (True, "Cracow")]
+    )
+    def test_ignore_case(
+        self,
+        ignore_case: bool,
+        expected_value: str | None,
+        is_equal_comparer: Callable[[Any, Any], bool],
+        example_response: Response,
+    ):
+        checker = JsonChecker(
+            comparer=is_equal_comparer,
+            expected_value="test",
+            dict_path="city",
+            ignore_case=ignore_case,
+        )
+        assert checker.prepare_data(example_response) == expected_value
+
 
 class TestHeadersChecker:
     def test_str(self, is_equal_comparer: Callable[[Any, Any], bool]):
         checker = HeadersChecker(is_equal_comparer, 5)
         msg = (
-            "Checker: HeadersChecker | Comparer: comparer | Dictor_fallback: None |"
-            " Expected_value: 5 | Path: None | Search_query: None | Data: None"
+            "Checker: HeadersChecker | Comparer: comparer | Dictor_fallback: None"
+            " | Expected_value: 5 | Ignore_case: False | Path: None"
+            " | Search_query: None | Data: None"
         )
 
         assert str(checker) == msg
@@ -342,8 +366,8 @@ class TestHeadersChecker:
                 20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
+                " | Search_query: None | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -363,8 +387,8 @@ class TestHeadersChecker:
                 10,
                 "Check success! | uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
+                " | Search_query: None | Data: WebLudus.pl",
             ),
         ]
         assert checker.check(example_response) is True
@@ -397,8 +421,8 @@ class TestHeadersChecker:
                 20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: example.com | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                " | Expected_value: example.com | Ignore_case: False | Path: Server"
+                " | Search_query: None | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -419,7 +443,8 @@ class TestHeadersChecker:
                 "Check uuid: TestHeadersChecker | Condition not met"
                 " | Checker: HeadersChecker | Comparer: comparer"
                 " | Dictor_fallback: None | Expected_value: example.com"
-                " | Path: Server | Search_query: None | Data: WebLudus.pl",
+                " | Ignore_case: False | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
         ]
         assert checker.check(example_response) is False

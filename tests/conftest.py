@@ -48,6 +48,7 @@ def example_dict_content() -> dict[str, Any]:
         "empty": "",
         "false": False,
         "name": "Jack",
+        "City": "Cracow",
     }
 
 

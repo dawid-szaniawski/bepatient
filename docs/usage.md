@@ -44,6 +44,9 @@ Waits for a specified value in response.
   response data. Defaults to None.
 - retries `(int, optional)`: the number of retries to perform. Defaults to 60.
 - delay `(int, optional)`: the delay between retries in seconds. Defaults to 1.
+- req_timeout `(int | tuple[int, int] | None, optional)`: request timeout in seconds.
+  Default value is 15 for connect and 30 for read (15, 30). If user provide one value,
+  it will be applied to both - connect and read timeouts.
 
 ##### Returns:
 
@@ -89,6 +92,8 @@ Wait for multiple specified values in a response using different checkers.
       response data. Defaults to None.
     * search_query `(str | None, optional)`: a search query to use to find the value in
       the response data. Defaults to None.
+    * ignore_case `(bool, optional)`: If set, upper/lower-case keys in `dict_path` are
+      treated the same. Defaults to False.
 - status_code `(int, optional)`: the expected HTTP status code. Defaults to 200.
 - session `(Session | None, optional)`: the requests session to use for sending
   requests. Defaults to None.
@@ -158,6 +163,8 @@ Add a response checker to the waiter.
   response data. Defaults to None.
 - search_query `(str | None, optional)`: a search query to use to find the value in the
   response data. Defaults to None.
+- ignore_case `(bool, optional)`: If set, upper/lower-case keys in `dict_path` are
+  treated the same. Defaults to False.
 
 ###### Returns:
 

@@ -18,7 +18,9 @@ class RequestsWaiter:
         status_code (int, optional): The expected HTTP status code. Defaults to 200.
         session (Session | None, optional): The requests session to use for sending
             requests. Defaults to None.
-        timeout (int | None, optional): request timeout in seconds.
+        timeout (int | tuple[int, int] | None, optional): request timeout in seconds.
+            Default value is 15 for connect and 30 for read (15, 30). If user provide
+            one value, it will be applied to both - connect and read timeouts.
 
     Example:
         To wait for a JSON response where the "status" field equals 200 using a
@@ -38,7 +40,7 @@ class RequestsWaiter:
         request: PreparedRequest | Request | Response,
         status_code: int = 200,
         session: Session | None = None,
-        timeout: int = 5,
+        timeout: int | tuple[int, int] | None = None,
     ):
         self.executor = RequestsExecutor(
             req_or_res=request,
@@ -54,6 +56,7 @@ class RequestsWaiter:
         checker: CHECKERS = "json_checker",
         dict_path: str | None = None,
         search_query: str | None = None,
+        ignore_case: bool = False,
     ):
         """Add a response checker to the waiter.
 
@@ -67,6 +70,8 @@ class RequestsWaiter:
                 response data. Defaults to None.
             search_query (str | None, optional): A search query to use to find the value
                 in the response data. Defaults to None.
+            ignore_case (bool, optional): If set, upper/lower-case keys in dict_path
+                are treated the same. Defaults to False.
 
         Returns:
             self: updated RequestsWaiter instance."""
@@ -76,6 +81,7 @@ class RequestsWaiter:
                 expected_value=expected_value,
                 dict_path=dict_path,
                 search_query=search_query,
+                ignore_case=ignore_case,
             )
         )
         return self
@@ -135,6 +141,7 @@ def wait_for_value_in_request(
     search_query: str | None = None,
     retries: int = 60,
     delay: int = 1,
+    req_timeout: int | tuple[int, int] | None = None,
 ) -> Response:
     """Wait for a specified value in a response.
 
@@ -155,6 +162,9 @@ def wait_for_value_in_request(
             the response data. Defaults to None.
         retries (int, optional): The number of retries to perform. Defaults to 60.
         delay (int, optional): The delay between retries in seconds. Defaults to 1.
+        req_timeout (int | tuple[int, int] | None, optional): request timeout in
+            seconds. Default value is 15 for connect and 30 for read (15, 30). If user
+            provide one value, it will be applied to both - connect and read timeouts.
 
     Returns:
         Response: the final response containing the expected value.
@@ -177,7 +187,9 @@ def wait_for_value_in_request(
                 dict_path="data",
             )
         ```"""
-    waiter = RequestsWaiter(request=request, status_code=status_code, session=session)
+    waiter = RequestsWaiter(
+        request=request, status_code=status_code, session=session, timeout=req_timeout
+    )
 
     if comparer:
         waiter.add_checker(
@@ -198,6 +210,7 @@ def wait_for_values_in_request(
     session: Session | None = None,
     retries: int = 60,
     delay: int = 1,
+    req_timeout: int | tuple[int, int] | None = None,
 ) -> Response:
     """Wait for multiple specified values in a response using different checkers.
 
@@ -216,11 +229,16 @@ def wait_for_values_in_request(
                     in the response data. Defaults to None.
                - search_query (str | None, optional): A search query to use to find the
                     value in the response data. Defaults to None.
+               - ignore_case (bool, optional): If set, upper/lower-case keys in
+                    dict_path are treated the same. Defaults to False.
         status_code (int, optional): The expected HTTP status code. Defaults to 200.
         session (Session | None, optional): The requests session to use for sending
                requests. Defaults to None.
         retries (int, optional): The number of retries to perform. Defaults to 60.
         delay (int, optional): The delay between retries in seconds. Defaults to 1.
+        req_timeout (int | tuple[int, int] | None, optional): request timeout in
+            seconds. Default value is 15 for connect and 30 for read (15, 30). If user
+            provide one value, it will be applied to both - connect and read timeouts.
 
     Returns:
         Response: the final response containing the expected values.
@@ -255,7 +273,9 @@ def wait_for_values_in_request(
                retries=5
            )
         ```"""
-    waiter = RequestsWaiter(request=request, status_code=status_code, session=session)
+    waiter = RequestsWaiter(
+        request=request, status_code=status_code, session=session, timeout=req_timeout
+    )
 
     for checker_dict in checkers:
         waiter.add_checker(**checker_dict)

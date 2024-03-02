@@ -386,9 +386,9 @@ class TestRequestExecutor:
 
         assert executor.request == expected_request
 
-    def test_set_5s_timeout_if_timeout_not_provided(self, prepared_request):
+    def test_set_default_timeout_if_timeout_not_provided(self, prepared_request):
         executor = RequestsExecutor(
             req_or_res=prepared_request, expected_status_code=200
         )
 
-        assert executor.timeout == 5
+        assert executor.timeout == (15, 30)
