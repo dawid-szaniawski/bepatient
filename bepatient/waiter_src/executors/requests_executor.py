@@ -17,18 +17,25 @@ class RequestsExecutor(Executor):
         req_or_res (PreparedRequest | Request | Response): request to send.
         expected_status_code (int): expected HTTP status code of the response
         session (Session | None, optional): requests session to use.
-        timeout (int | None, optional): request timeout in seconds."""
+        timeout (int | tuple[int, int] | None, optional): request timeout in seconds.
+            Default value is 15 for connect and 30 for read (15, 30). If user provide
+            one value, it will be applied to both - connect and read timeouts."""
 
     def __init__(
         self,
         req_or_res: PreparedRequest | Request | Response,
         expected_status_code: int,
         session: Session | None = None,
-        timeout: int = 5,
+        timeout: int | tuple[int, int] | None = None,
     ):
         super().__init__()
-        self.timeout = timeout
+
         self._status_code_checker = StatusCodeChecker(is_equal, expected_status_code)
+
+        if timeout:
+            self.timeout = timeout
+        else:
+            self.timeout = (15, 30)
 
         if session:
             self.session = session

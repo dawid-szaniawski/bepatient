@@ -96,11 +96,11 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
-                "Sent: curl -X GET -H 'Content-Type: application/json'"
-                " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
-                " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0)"
-                " Gecko/20100101' -H 'task: test' -H 'Cookie: pytest=fixture;"
-                " user-token=abc-123' https://webludus.pl/",
+                "Sent: curl -X GET -H 'Content-Type: application/json' -H"
+                " 'Accept-Language: en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent:"
+                " Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task:"
+                " test' -H 'Cookie: pytest=fixture; user-token=abc-123'"
+                " https://webludus.pl/",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -132,11 +132,11 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
-                "Sent: curl -X GET -H 'Content-Type: application/json'"
-                " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
-                " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0)"
-                " Gecko/20100101' -H 'task: test' -H 'Cookie: pytest=fixture;"
-                " user-token=abc-123' https://webludus.pl/",
+                "Sent: curl -X GET -H 'Content-Type: application/json' -H"
+                " 'Accept-Language: en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent:"
+                " Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task:"
+                " test' -H 'Cookie: pytest=fixture; user-token=abc-123'"
+                " https://webludus.pl/",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -159,8 +159,8 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: 3 | Checker: JsonChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: Jack | Path: name"
-                " | Search_query: None | Data: Jack",
+                " | Dictor_fallback: None | Expected_value: Jack | Ignore_case: False"
+                " | Path: name | Search_query: None | Data: Jack",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -170,15 +170,15 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 40,
-                "Check uuid: 3 | Expected: Jack"
-                " | Headers: {'Content-Type': 'text/plain'} | Content b''",
+                "Check uuid: 3 | Expected: Jack | Headers:"
+                " {'Content-Type': 'text/plain'} | Content b''",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: 3 | Condition not met | Checker: JsonChecker"
                 " | Comparer: is_equal | Dictor_fallback: None | Expected_value: Jack"
-                " | Path: name | Search_query: None | Data: Jack",
+                " | Ignore_case: False | Path: name | Search_query: None | Data: Jack",
             ),
             (
                 "bepatient.waiter_src.waiter",
@@ -193,11 +193,11 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
-                "Sent: curl -X GET -H 'Content-Type: application/json'"
-                " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
-                " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0)"
-                " Gecko/20100101' -H 'task: test' -H 'Cookie: pytest=fixture;"
-                " user-token=abc-123' https://webludus.pl/",
+                "Sent: curl -X GET -H 'Content-Type: application/json' -H"
+                " 'Accept-Language: en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent:"
+                " Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task:"
+                " test' -H 'Cookie: pytest=fixture; user-token=abc-123'"
+                " https://webludus.pl/",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -208,10 +208,11 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: 4 | Response status code: 200 | Response content:"
-                ' b\'{"list_of_dicts": [{"name": "John", "age": 30}, {"name": "Mike",'
+                "Check uuid: 4 | Response status code: 200 | Response content: "
+                'b\'{"list_of_dicts": [{"name": "John", "age": 30}, {"name": "Mike",'
                 ' "age": 15}], "ok": true, "some_number": 123, "list": ["1", "2", "3"],'
-                ' "none": null, "empty": "", "false": false, "name": "Jack"}\'',
+                ' "none": null, "empty": "", "false": false, "name": "Jack",'
+                ' "City": "Cracow"}\'',
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -223,8 +224,8 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: 5 | Checker: JsonChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: Jack | Path: name"
-                " | Search_query: None | Data: Jack",
+                " | Dictor_fallback: None | Expected_value: Jack | Ignore_case: False"
+                " | Path: name | Search_query: None | Data: Jack",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -232,7 +233,7 @@ class TestRequestsWaiter:
                 'Check uuid: 5 | Response content: b\'{"list_of_dicts": [{"name":'
                 ' "John", "age": 30}, {"name": "Mike", "age": 15}], "ok": true,'
                 ' "some_number": 123, "list": ["1", "2", "3"], "none": null, "empty":'
-                ' "", "false": false, "name": "Jack"}\'',
+                ' "", "false": false, "name": "Jack", "City": "Cracow"}\'',
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -244,8 +245,8 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checker",
                 10,
                 "Check success! | uuid: 5 | Checker: JsonChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: Jack | Path: name"
-                " | Search_query: None | Data: Jack",
+                " | Dictor_fallback: None | Expected_value: Jack | Ignore_case: False"
+                " | Path: name | Search_query: None | Data: Jack",
             ),
             ("bepatient.waiter_src.waiter", 20, "Condition met!"),
         ]
@@ -300,16 +301,16 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
                 "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123;"
-                " pytest=fixture' -H 'Content-Type: application/json'"
-                " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
-                " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0)"
-                " Gecko/20100101' https://webludus.pl/",
+                " pytest=fixture' -H 'Content-Type: application/json' -H"
+                " 'Accept-Language: en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent:"
+                " Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101'"
+                " https://webludus.pl/",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: A | Checker: StatusCodeChecker | Comparer: is_equal"
-                " | Expected_value: 200 | Data: 200",
+                "Check uuid: A | Checker: StatusCodeChecker | Comparer: is_equal | "
+                "Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -335,25 +336,26 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
-                "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123;"
-                " pytest=fixture' -H 'Content-Type: application/json'"
-                " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
-                " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0)"
-                " Gecko/20100101' https://webludus.pl/",
+                "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123; "
+                "pytest=fixture' -H 'Content-Type: application/json' -H"
+                " 'Accept-Language: en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent:"
+                " Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101'"
+                " https://webludus.pl/",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
-                "Check uuid: B | Checker: StatusCodeChecker | Comparer: is_equal"
-                " | Expected_value: 200 | Data: 200",
+                "Check uuid: B | Checker: StatusCodeChecker | Comparer: is_equal | "
+                "Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: B | Response status code: 200 | Response content:"
-                ' b\'{"list_of_dicts": [{"name": "John", "age": 30}, {"name": "Mike",'
+                "Check uuid: B | Response status code: 200 | Response content: "
+                'b\'{"list_of_dicts": [{"name": "John", "age": 30}, {"name": "Mike",'
                 ' "age": 15}], "ok": true, "some_number": 123, "list": ["1", "2", "3"],'
-                ' "none": null, "empty": "", "false": false, "name": "Jack"}\'',
+                ' "none": null, "empty": "", "false": false, "name": "Jack",'
+                ' "City": "Cracow"}\'',
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -366,14 +368,15 @@ class TestRequestsWaiter:
                 20,
                 "Check uuid: C | Checker: HeadersChecker | Comparer: is_equal"
                 " | Dictor_fallback: None | Expected_value: gunicorn"
-                " | Path: X-Render-Origin_Server | Search_query: None | Data: gunicorn",
+                " | Ignore_case: False | Path: X-Render-Origin_Server"
+                " | Search_query: None | Data: gunicorn",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 20,
-                "Check uuid: C | Response headers: {'Content-Language': 'en-US',"
-                " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
-                " 'X-Render-Origin_Server': 'gunicorn'}",
+                "Check uuid: C | Response headers: {'Content-Language': 'en-US', "
+                "'Content-Type': 'application/json', 'Server': 'WebLudus.pl', "
+                "'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -386,8 +389,8 @@ class TestRequestsWaiter:
                 10,
                 "Check success! | uuid: C | Checker: HeadersChecker"
                 " | Comparer: is_equal | Dictor_fallback: None"
-                " | Expected_value: gunicorn | Path: X-Render-Origin_Server"
-                " | Search_query: None | Data: gunicorn",
+                " | Expected_value: gunicorn | Ignore_case: False"
+                " | Path: X-Render-Origin_Server | Search_query: None | Data: gunicorn",
             ),
             ("bepatient.waiter_src.waiter", 20, "Condition met!"),
         ]
@@ -503,8 +506,9 @@ class TestRequestsWaiter:
                 "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: TEST2 | Checker: HeadersChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: WebLudus.pl | Path: Server"
-                " | Search_query: None | Data: WebLudus.pl",
+                " | Dictor_fallback: None | Expected_value: WebLudus.pl"
+                " | Ignore_case: False | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -522,8 +526,8 @@ class TestRequestsWaiter:
                 20,
                 "Check uuid: TEST2 | Condition not met | Checker: HeadersChecker"
                 " | Comparer: is_equal | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
+                " | Search_query: None | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.waiter",
@@ -538,8 +542,8 @@ class TestRequestsWaiter:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 20,
-                "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
-                " https://webludus.pl/",
+                "Sent: curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' "
+                "https://webludus.pl/",
             ),
             (
                 "bepatient.waiter_src.checker",
@@ -553,20 +557,22 @@ class TestRequestsWaiter:
                 "Check uuid: TEST3 | Response status code: 200 | Response content:"
                 ' b\'{"list_of_dicts": [{"name": "John", "age": 30}, {"name": "Mike",'
                 ' "age": 15}], "ok": true, "some_number": 123, "list": ["1", "2", "3"],'
-                ' "none": null, "empty": "", "false": false, "name": "Jack"}\'',
+                ' "none": null, "empty": "", "false": false, "name": "Jack",'
+                ' "City": "Cracow"}\'',
             ),
             (
                 "bepatient.waiter_src.checker",
                 10,
-                "Check success! | uuid: TEST3 | Checker: StatusCodeChecker"
-                " | Comparer: is_equal | Expected_value: 200 | Data: 200",
+                "Check success! | uuid: TEST3 | Checker: StatusCodeChecker | Comparer: "
+                "is_equal | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checker",
                 20,
                 "Check uuid: TEST4 | Checker: HeadersChecker | Comparer: is_equal"
-                " | Dictor_fallback: None | Expected_value: WebLudus.pl | Path: Server"
-                " | Search_query: None | Data: WebLudus.pl",
+                " | Dictor_fallback: None | Expected_value: WebLudus.pl"
+                " | Ignore_case: False | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
@@ -586,8 +592,8 @@ class TestRequestsWaiter:
                 10,
                 "Check success! | uuid: TEST4 | Checker: HeadersChecker"
                 " | Comparer: is_equal | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
+                " | Search_query: None | Data: WebLudus.pl",
             ),
             ("bepatient.waiter_src.waiter", 20, "Condition met!"),
         ]

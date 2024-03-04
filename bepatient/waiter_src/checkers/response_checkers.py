@@ -42,6 +42,8 @@ class JsonChecker(Checker):
             data. Defaults to None.
         dictor_fallback (str, optional): A default value to return if the value at the
             specified path is not found using `dictor`. Defaults to None.
+        ignore_case (bool, optional): If set, upper/lower-case keys in dict_path are
+            treated the same. Defaults to False.
 
     Example:
         To check if a specific field "status" in a JSON response equals 200:
@@ -58,11 +60,13 @@ class JsonChecker(Checker):
         dict_path: str | None = None,
         search_query: str | None = None,
         dictor_fallback: str | None = None,
+        ignore_case: bool = False,
     ):
         super().__init__(comparer, expected_value)
         self.path = dict_path
         self.search_query = search_query
         self.dictor_fallback = dictor_fallback
+        self.ignore_case = ignore_case
 
     @staticmethod
     def parse_response(
@@ -94,6 +98,7 @@ class JsonChecker(Checker):
                 path=self.path,
                 search=self.search_query,
                 default=self.dictor_fallback,
+                ignorecase=self.ignore_case,
             )
             log.info(
                 "Check uuid: %s | Dictor path: %s"

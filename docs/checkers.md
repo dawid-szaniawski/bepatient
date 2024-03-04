@@ -29,9 +29,9 @@ print(CHECKERS)
 ## Custom checkers
 
 If the default checkers provided with _bepatient_ are not sufficient, you can create
-your own Checker.
+your own `Checker`.
 
-To do this, you need an object that inherits from the Checker class:
+To do this, you need an object that inherits from the `Checker` class:
 
 ```python
 import logging
