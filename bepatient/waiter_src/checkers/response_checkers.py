@@ -5,7 +5,7 @@ from typing import Any, Callable
 from dictor import dictor
 from requests import Response
 
-from bepatient.waiter_src.checker import Checker
+from .checker import Checker
 
 log = logging.getLogger(__name__)
 

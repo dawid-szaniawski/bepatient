@@ -56,7 +56,7 @@ class TestStatusCodeChecker:
         monkeypatch.setattr("uuid.uuid4", lambda: "TestStatusCodeChecker")
         logs = [
             (
-                "bepatient.waiter_src.checker",
+                "bepatient.waiter_src.checkers.checker",
                 20,
                 "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
                 " | Comparer: comparer | Expected_value: 200 | Data: 200",
@@ -71,7 +71,7 @@ class TestStatusCodeChecker:
                 ', "name": "Jack", "City": "Cracow"}\'',
             ),
             (
-                "bepatient.waiter_src.checker",
+                "bepatient.waiter_src.checkers.checker",
                 10,
                 "Check success! | uuid: TestStatusCodeChecker"
                 " | Checker: StatusCodeChecker | Comparer: comparer"
@@ -362,7 +362,7 @@ class TestHeadersChecker:
         )
         logs = [
             (
-                "bepatient.waiter_src.checker",
+                "bepatient.waiter_src.checkers.checker",
                 20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
@@ -383,7 +383,7 @@ class TestHeadersChecker:
                 " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
             (
-                "bepatient.waiter_src.checker",
+                "bepatient.waiter_src.checkers.checker",
                 10,
                 "Check success! | uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
@@ -417,7 +417,7 @@ class TestHeadersChecker:
         )
         logs = [
             (
-                "bepatient.waiter_src.checker",
+                "bepatient.waiter_src.checkers.checker",
                 20,
                 "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
@@ -438,7 +438,7 @@ class TestHeadersChecker:
                 " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
             (
-                "bepatient.waiter_src.checker",
+                "bepatient.waiter_src.checkers.checker",
                 20,
                 "Check uuid: TestHeadersChecker | Condition not met"
                 " | Checker: HeadersChecker | Comparer: comparer"

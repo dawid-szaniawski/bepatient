@@ -3,8 +3,8 @@ from typing import Any
 from requests import PreparedRequest, Request, Response, Session
 
 from .curler import Curler
-from .waiter_src.checker import Checker
 from .waiter_src.checkers import CHECKERS, RESPONSE_CHECKERS
+from .waiter_src.checkers.checker import Checker
 from .waiter_src.comparators import COMP_DICT, COMPARATORS
 from .waiter_src.executors.requests_executor import RequestsExecutor
 from .waiter_src.waiter import wait_for_executor
