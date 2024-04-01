@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from bepatient.waiter_src.checker import Checker
+from bepatient.waiter_src.checkers.checker import Checker
 from bepatient.waiter_src.exceptions.executor_exceptions import ExecutorIsNotReady
 
 

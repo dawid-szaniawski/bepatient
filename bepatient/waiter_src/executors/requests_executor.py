@@ -6,11 +6,13 @@ from requests.exceptions import RequestException
 from bepatient.curler import Curler
 from bepatient.waiter_src.checkers.response_checkers import StatusCodeChecker
 from bepatient.waiter_src.comparators import is_equal
-from bepatient.waiter_src.executor import Executor
+
+from .executor import Executor
 
 log = logging.getLogger(__name__)
 
 
+# pylint: disable-next=too-many-instance-attributes
 class RequestsExecutor(Executor):
     """An executor that sends a request and waits for a certain condition to be met.
     Args:
@@ -29,7 +31,8 @@ class RequestsExecutor(Executor):
         timeout: int | tuple[int, int] | None = None,
     ):
         super().__init__()
-
+        self._result: Response | None = None
+        self._take_from_result: bool = False
         self._status_code_checker = StatusCodeChecker(is_equal, expected_status_code)
 
         if timeout:
@@ -49,6 +52,7 @@ class RequestsExecutor(Executor):
             self.request = req_or_res
         else:
             self._result = req_or_res
+            self._take_from_result = True
             if len(self._result.history) > 0:
                 self.request = self._result.history[0].request
             else:
@@ -79,13 +83,18 @@ class RequestsExecutor(Executor):
 
         Raises:
             ExecutorIsNotReady: If the executor is not ready to send the request."""
-        try:
-            self._result = self.session.send(request=self.request, timeout=self.timeout)
-            self._input = Curler().to_curl(self._result)
-            log.info("Sent: %s", self._input)
-        except RequestException:
-            log.exception("RequestException! CURL: %s", self._input)
-            return False
+        if not self._take_from_result:
+            try:
+                self._result = self.session.send(
+                    request=self.request, timeout=self.timeout
+                )
+                self._input = Curler().to_curl(self._result)
+                log.info("Sent: %s", self._input)
+            except RequestException:
+                log.exception("RequestException! CURL: %s", self._input)
+                return False
+        else:
+            self._take_from_result = False
 
         if self._status_code_checker.check(self._result):
             self._failed_checkers = [

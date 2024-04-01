@@ -71,7 +71,7 @@ Source = "https://github.com/dawid-szaniawski/bepatient"
 Documentation = "https://webludus.pages.dev/"
 
 [tool.setuptools]
-include-package-data = false
+include-package-data = true
 
 [tool.setuptools.dynamic]
 version = { attr = "bepatient.__version__" }

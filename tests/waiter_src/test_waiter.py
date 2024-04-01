@@ -2,7 +2,7 @@ import pytest
 from pytest_mock import MockerFixture
 
 from bepatient.waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
-from bepatient.waiter_src.executor import Executor
+from bepatient.waiter_src.executors.executor import Executor
 from bepatient.waiter_src.waiter import wait_for_executor
 
 

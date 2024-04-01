@@ -8,7 +8,7 @@ from pytest_mock import MockerFixture
 from requests import PreparedRequest, Request, RequestException, Response, Session
 from responses import RequestsMock
 
-from bepatient.waiter_src.checker import Checker
+from bepatient.waiter_src.checkers.checker import Checker
 from bepatient.waiter_src.exceptions.executor_exceptions import ExecutorIsNotReady
 from bepatient.waiter_src.executors.requests_executor import RequestsExecutor
 
@@ -64,6 +64,7 @@ class TestRequestExecutor:
         caplog: LogCaptureFixture,
     ):
         response = request.getfixturevalue(fixture_name)
+        response.status_code = 404
         res_mock = mocked_responses.get(
             response.request.url,
             status=200,
@@ -83,6 +84,7 @@ class TestRequestExecutor:
         assert "Merging session.cookies into PreparedRequest object" in caplog.text
         if additional_log:
             assert "PreparedRequest already has cookies" in caplog.text
+        assert not executor.is_condition_met()
         assert executor.is_condition_met()
         assert res_mock.call_count == 1
         assert executor.get_result().request.headers == expected_request_headers

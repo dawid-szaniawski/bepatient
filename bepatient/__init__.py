@@ -9,11 +9,11 @@ from .api import (
     wait_for_value_in_request,
     wait_for_values_in_request,
 )
-from .waiter_src.checker import Checker
 from .waiter_src.checkers import CHECKERS
+from .waiter_src.checkers.checker import Checker
 from .waiter_src.comparators import COMPARATORS
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 __all__ = [
     "Checker",
     "CHECKERS",

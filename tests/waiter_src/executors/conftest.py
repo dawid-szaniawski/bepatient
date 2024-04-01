@@ -3,7 +3,7 @@ from typing import Any, Callable
 import pytest
 from requests import Response
 
-from bepatient.waiter_src.checker import Checker
+from bepatient.waiter_src.checkers.checker import Checker
 
 
 @pytest.fixture
