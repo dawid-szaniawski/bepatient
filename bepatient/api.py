@@ -3,9 +3,9 @@ from typing import Any
 from requests import PreparedRequest, Request, Response, Session
 
 from .curler import Curler
+from .waiter_src import comparators
 from .waiter_src.checkers import CHECKERS, RESPONSE_CHECKERS
 from .waiter_src.checkers.checker import Checker
-from .waiter_src.comparators import COMP_DICT, COMPARATORS
 from .waiter_src.executors.requests_executor import RequestsExecutor
 from .waiter_src.waiter import wait_for_executor
 
@@ -52,7 +52,7 @@ class RequestsWaiter:
     def add_checker(
         self,
         expected_value: Any,
-        comparer: COMPARATORS,
+        comparer: comparators.COMPARATORS,
         checker: CHECKERS = "json_checker",
         dict_path: str | None = None,
         search_query: str | None = None,
@@ -77,7 +77,7 @@ class RequestsWaiter:
             self: updated RequestsWaiter instance."""
         self.executor.add_checker(
             RESPONSE_CHECKERS[checker](  # type: ignore
-                comparer=COMP_DICT[comparer],
+                comparer=getattr(comparators, comparer),
                 expected_value=expected_value,
                 dict_path=dict_path,
                 search_query=search_query,
@@ -133,7 +133,7 @@ class RequestsWaiter:
 def wait_for_value_in_request(
     request: PreparedRequest | Request | Response,
     status_code: int = 200,
-    comparer: COMPARATORS | None = None,
+    comparer: comparators.COMPARATORS | None = None,
     expected_value: Any = None,
     checker: CHECKERS = "json_checker",
     session: Session | None = None,
