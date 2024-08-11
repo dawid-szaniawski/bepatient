@@ -21,7 +21,7 @@ class StatusCodeChecker(Checker):
         Returns:
             int: prepared status code for comparison."""
         status_code = data.status_code
-        log.info(
+        log.debug(
             "Check uuid: %s | Response status code: %s | Response content: %s",
             run_uuid,
             status_code,
@@ -100,7 +100,7 @@ class JsonChecker(Checker):
                 default=self.dictor_fallback,
                 ignorecase=self.ignore_case,
             )
-            log.info(
+            log.debug(
                 "Check uuid: %s | Dictor path: %s"
                 " | Dictor search: %s | Dictor data: %s",
                 run_uuid,
@@ -144,5 +144,5 @@ class HeadersChecker(JsonChecker):
         Returns:
             dict[str, str]: The parsed response headers for comparison."""
         headers = dict(data.headers)
-        log.info("Check uuid: %s | Response headers: %s", run_uuid, headers)
+        log.debug("Check uuid: %s | Response headers: %s", run_uuid, headers)
         return headers

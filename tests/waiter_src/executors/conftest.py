@@ -15,7 +15,7 @@ def checker_true(is_equal_comparer: Callable[[Any, Any], bool]) -> Checker:
         def prepare_data(self, data: Any, run_uuid: str | None = None) -> None:
             """mock"""
 
-        def check(self, data: Any) -> bool:
+        def check(self, data: Any, run_uuid: str) -> bool:
             return True
 
     checker = CheckerMocker(comparer=is_equal_comparer, expected_value="")
@@ -32,7 +32,7 @@ def checker_false(is_equal_comparer: Callable[[Any, Any], bool]) -> Checker:
         def prepare_data(self, data: Any, run_uuid: str | None = None) -> None:
             """mock"""
 
-        def check(self, data: Any) -> bool:
+        def check(self, data: Any, run_uuid: str) -> bool:
             return False
 
     return CheckerMocker(comparer=is_equal_comparer, expected_value="")

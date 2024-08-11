@@ -36,7 +36,10 @@ arguments and returns a boolean value.
 
 Example:
 ```python
-def is_instance(data, expected_value):
+from typing import Any
+
+
+def is_instance(data: Any, expected_value: Any) -> bool:
     return is_instance(data, expected_value)
 ```
 

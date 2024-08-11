@@ -1,5 +1,4 @@
 import logging
-import uuid
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 
@@ -37,20 +36,20 @@ class Checker(ABC):
         Returns:
             Any: Data for comparison."""
 
-    def check(self, data: Any) -> bool:
+    def check(self, data: Any, run_uuid: str) -> bool:
         """Check if the given data meets a certain condition.
 
         Args:
             data (Any): The data to be checked.
+            run_uuid (str): unique run identifier.
 
         Returns:
             bool: True if the condition is met, False otherwise."""
-        run_uuid = str(uuid.uuid4())
-        log.info("Check uuid: %s | %s", run_uuid, self)
+        log.debug("Check uuid: %s | %s", run_uuid, self)
 
         self._prepared_data = self.prepare_data(data, run_uuid)
         if self.comparer(self._prepared_data, self.expected_value):
-            log.debug(
+            log.info(
                 "Check success! | uuid: %s | %s",
                 run_uuid,
                 self,

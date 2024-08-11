@@ -238,7 +238,7 @@ class TestRequestExecutor:
             def prepare_data(self, data: Any, run_uuid: str | None = None) -> None:
                 """mock"""
 
-            def check(self, data: Any) -> bool:
+            def check(self, data: Any, run_uuid: str) -> bool:
                 return False
 
         executor = (

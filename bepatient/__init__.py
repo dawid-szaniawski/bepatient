@@ -1,4 +1,5 @@
 """A library facilitating work with asynchronous APIs"""
+
 import logging
 from logging import NullHandler
 
@@ -13,7 +14,7 @@ from .waiter_src.checkers import CHECKERS
 from .waiter_src.checkers.checker import Checker
 from .waiter_src.comparators import COMPARATORS
 
-__version__ = "0.10.1"
+__version__ = "0.10.2"
 __all__ = [
     "Checker",
     "CHECKERS",
