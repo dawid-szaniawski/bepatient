@@ -49,7 +49,7 @@ class Checker(ABC):
 
         self._prepared_data = self.prepare_data(data, run_uuid)
         if self.comparer(self._prepared_data, self.expected_value):
-            log.debug(
+            log.info(
                 "Check success! | uuid: %s | %s",
                 run_uuid,
                 self,

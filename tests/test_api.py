@@ -151,7 +151,7 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: 2 | Checker: StatusCodeChecker"
                 " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
@@ -216,7 +216,7 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: 3 | Checker: StatusCodeChecker"
                 " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
@@ -243,7 +243,7 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: 3 | Checker: JsonChecker | Comparer: is_equal"
                 " | Dictor_fallback: None | Expected_value: Jack | Ignore_case: False"
                 " | Path: name | Search_query: None | Data: Jack",
@@ -356,7 +356,7 @@ class TestRequestsWaiter:
         res = Response()
         res.status_code = 200
         res.request = prepared_request
-        mocker.patch("uuid.uuid4", side_effect=["TEST1", "TEST2", "TEST3", "TEST4"])
+        mocker.patch("uuid.uuid4", side_effect=["TEST1", "TEST2"])
         mocker.patch(
             "requests.Session.send",
             side_effect=[res, example_response],
@@ -392,7 +392,7 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: TEST1 | Checker: StatusCodeChecker"
                 " | Comparer: is_equal | Expected_value: 200 | Data: 200",
             ),
@@ -456,7 +456,7 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: TEST2 | Checker: StatusCodeChecker | Comparer:"
                 " is_equal | Expected_value: 200 | Data: 200",
             ),
@@ -483,7 +483,7 @@ class TestRequestsWaiter:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: TEST2 | Checker: HeadersChecker"
                 " | Comparer: is_equal | Dictor_fallback: None"
                 " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"

@@ -70,7 +70,7 @@ class TestStatusCodeChecker:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: TestStatusCodeChecker"
                 " | Checker: StatusCodeChecker | Comparer: comparer"
                 " | Expected_value: 200 | Data: 200",
@@ -384,7 +384,7 @@ class TestHeadersChecker:
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
-                10,
+                20,
                 "Check success! | uuid: TEST | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
                 " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
