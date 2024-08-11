@@ -33,7 +33,7 @@ class TestStatusCodeChecker:
         logs = [
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
+                10,
                 "Check uuid: None | Response status code: 200 | Response content:"
                 ' b\'{"list_of_dicts": [{"name": "John", "age": 30},'
                 ' {"name": "Mike", "age": 15}], "ok": true, "some_number": 123,'
@@ -50,20 +50,18 @@ class TestStatusCodeChecker:
         is_equal_comparer: Callable[[Any, Any], bool],
         example_response: Response,
         caplog: LogCaptureFixture,
-        monkeypatch: pytest.MonkeyPatch,
     ):
         checker = StatusCodeChecker(is_equal_comparer, 200)
-        monkeypatch.setattr("uuid.uuid4", lambda: "TestStatusCodeChecker")
         logs = [
             (
                 "bepatient.waiter_src.checkers.checker",
-                20,
+                10,
                 "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
                 " | Comparer: comparer | Expected_value: 200 | Data: 200",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
+                10,
                 "Check uuid: TestStatusCodeChecker | Response status code: 200"
                 ' | Response content: b\'{"list_of_dicts": [{"name": "John", "age": 30}'
                 ', {"name": "Mike", "age": 15}], "ok": true, "some_number": 123, "list"'
@@ -79,7 +77,10 @@ class TestStatusCodeChecker:
             ),
         ]
 
-        assert checker.check(example_response) is True
+        assert (
+            checker.check(data=example_response, run_uuid="TestStatusCodeChecker")
+            is True
+        )
         assert caplog.record_tuples == logs
 
 
@@ -100,7 +101,7 @@ class TestJsonChecker:
         checker = JsonChecker(
             comparer=is_equal_comparer, expected_value=True, dict_path="ok"
         )
-        assert checker.check(example_response) is True
+        assert checker.check(data=example_response, run_uuid="TEST") is True
 
     def test_list(
         self, contain_comparer: Callable[[Any, Any], bool], example_response: Response
@@ -108,7 +109,7 @@ class TestJsonChecker:
         checker = JsonChecker(
             comparer=contain_comparer, expected_value="2", dict_path="list"
         )
-        assert checker.check(example_response) is True
+        assert checker.check(data=example_response, run_uuid="TEST") is True
 
     def test_longer_dict_path(self, example_response: Response):
         checker = JsonChecker(
@@ -116,7 +117,7 @@ class TestJsonChecker:
             expected_value=18,
             dict_path="list_of_dicts.1.age",
         )
-        assert checker.check(example_response) is True
+        assert checker.check(data=example_response, run_uuid="TEST") is True
 
     def test_search_query(
         self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
@@ -127,7 +128,7 @@ class TestJsonChecker:
             dict_path="list_of_dicts",
             search_query="name",
         )
-        assert checker.check(example_response) is True
+        assert checker.check(data=example_response, run_uuid="TEST") is True
 
     def test_condition_not_met(
         self, contain_comparer: Callable[[Any, Any], bool], example_response: Response
@@ -138,7 +139,7 @@ class TestJsonChecker:
             dict_path="list_of_dicts",
             search_query="name",
         )
-        assert checker.check(example_response) is False
+        assert checker.check(data=example_response, run_uuid="TEST") is False
 
     def test_missing_key(
         self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
@@ -146,7 +147,7 @@ class TestJsonChecker:
         checker = JsonChecker(
             comparer=is_equal_comparer, expected_value="TEST", dict_path="status"
         )
-        assert checker.check(example_response) is False
+        assert checker.check(data=example_response, run_uuid="TEST") is False
 
     def test_missing_in_search_query(
         self,
@@ -156,7 +157,7 @@ class TestJsonChecker:
         checker = JsonChecker(
             comparer=is_equal_comparer, expected_value="TEST", search_query="name"
         )
-        assert checker.check(example_response) is False
+        assert checker.check(data=example_response, run_uuid="TEST") is False
 
     def test_null_value(
         self,
@@ -354,44 +355,44 @@ class TestHeadersChecker:
         is_equal_comparer: Callable[[Any, Any], bool],
         example_response: Response,
         caplog: LogCaptureFixture,
-        monkeypatch: pytest.MonkeyPatch,
     ):
-        monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
         checker = HeadersChecker(
             comparer=is_equal_comparer, expected_value="WebLudus.pl", dict_path="Server"
         )
+        # pylint: disable=duplicate-code
         logs = [
             (
                 "bepatient.waiter_src.checkers.checker",
-                20,
-                "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
-                " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
-                " | Search_query: None | Data: WebLudus.pl",
+                10,
+                "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
+                " | Dictor_fallback: None | Expected_value: WebLudus.pl"
+                " | Ignore_case: False | Path: Server | Search_query: None"
+                " | Data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
-                "Check uuid: TestHeadersChecker | Response headers:"
-                " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
-                " 'Server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
+                10,
+                "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
+                " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
+                " 'X-Render-Origin_Server': 'gunicorn'}",
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
-                20,
-                "Check uuid: TestHeadersChecker | Dictor path: Server"
+                10,
+                "Check uuid: TEST | Dictor path: Server"
                 " | Dictor search: None | Dictor data: WebLudus.pl",
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
                 10,
-                "Check success! | uuid: TestHeadersChecker | Checker: HeadersChecker"
+                "Check success! | uuid: TEST | Checker: HeadersChecker"
                 " | Comparer: comparer | Dictor_fallback: None"
                 " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
                 " | Search_query: None | Data: WebLudus.pl",
             ),
         ]
-        assert checker.check(example_response) is True
+        # pylint: enable=duplicate-code
+        assert checker.check(data=example_response, run_uuid="TEST") is True
         assert caplog.record_tuples == logs
 
     def test_search_query(
@@ -402,52 +403,49 @@ class TestHeadersChecker:
             expected_value=["application/json"],
             search_query="Content-Type",
         )
-        assert checker.check(example_response) is True
+        assert checker.check(data=example_response, run_uuid="TEST") is True
 
     def test_condition_not_met(
         self,
         is_equal_comparer: Callable[[Any, Any], bool],
         example_response: Response,
         caplog: LogCaptureFixture,
-        monkeypatch: pytest.MonkeyPatch,
     ):
-        monkeypatch.setattr("uuid.uuid4", lambda: "TestHeadersChecker")
         checker = HeadersChecker(
             comparer=is_equal_comparer, expected_value="example.com", dict_path="Server"
         )
         logs = [
             (
                 "bepatient.waiter_src.checkers.checker",
-                20,
-                "Check uuid: TestHeadersChecker | Checker: HeadersChecker"
-                " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: example.com | Ignore_case: False | Path: Server"
-                " | Search_query: None | Data: WebLudus.pl",
-            ),
-            (
-                "bepatient.waiter_src.checkers.response_checkers",
-                20,
-                "Check uuid: TestHeadersChecker | Response headers:"
-                " {'Content-Language': 'en-US', 'Content-Type': 'application/json',"
-                " 'Server': 'WebLudus.pl', 'X-Render-Origin_Server': 'gunicorn'}",
-            ),
-            (
-                "bepatient.waiter_src.checkers.response_checkers",
-                20,
-                "Check uuid: TestHeadersChecker | Dictor path: Server"
-                " | Dictor search: None | Dictor data: WebLudus.pl",
-            ),
-            (
-                "bepatient.waiter_src.checkers.checker",
-                20,
-                "Check uuid: TestHeadersChecker | Condition not met"
-                " | Checker: HeadersChecker | Comparer: comparer"
+                10,
+                "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
                 " | Dictor_fallback: None | Expected_value: example.com"
                 " | Ignore_case: False | Path: Server | Search_query: None"
                 " | Data: WebLudus.pl",
             ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                10,
+                "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
+                " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
+                " 'X-Render-Origin_Server': 'gunicorn'}",
+            ),
+            (
+                "bepatient.waiter_src.checkers.response_checkers",
+                10,
+                "Check uuid: TEST | Dictor path: Server | Dictor search: None"
+                " | Dictor data: WebLudus.pl",
+            ),
+            (
+                "bepatient.waiter_src.checkers.checker",
+                20,
+                "Check uuid: TEST | Condition not met | Checker: HeadersChecker"
+                " | Comparer: comparer | Dictor_fallback: None"
+                " | Expected_value: example.com | Ignore_case: False | Path: Server"
+                " | Search_query: None | Data: WebLudus.pl",
+            ),
         ]
-        assert checker.check(example_response) is False
+        assert checker.check(data=example_response, run_uuid="TEST") is False
         assert caplog.record_tuples == logs
 
     def test_missing_key(
@@ -456,7 +454,7 @@ class TestHeadersChecker:
         checker = HeadersChecker(
             comparer=is_equal_comparer, expected_value="TEST", dict_path="status"
         )
-        assert checker.check(example_response) is False
+        assert checker.check(data=example_response, run_uuid="TEST") is False
 
     def test_missing_in_search_query(
         self, is_equal_comparer: Callable[[Any, Any], bool], example_response: Response
@@ -464,4 +462,4 @@ class TestHeadersChecker:
         checker = HeadersChecker(
             comparer=is_equal_comparer, expected_value="TEST", search_query="name"
         )
-        assert checker.check(example_response) is False
+        assert checker.check(data=example_response, run_uuid="TEST") is False

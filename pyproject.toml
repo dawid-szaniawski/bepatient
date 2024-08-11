@@ -48,22 +48,22 @@ keywords = [
 
 [project.optional-dependencies]
 dev = [
-    "black>=23.7.0",
-    "flake8>=6.1.0",
-    "isort>=5.12.0",
-    "mypy>=1.4.1",
-    "pylint>=2.17.5",
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "pytest-mock>=3.11.1",
-    "responses>=0.24.1",
-    "ruff>=0.0.282",
-    "tox>=4.7.0",
-    "twine>=4.0.2"
+    "black>=24.8.0",
+    "flake8>=7.1.1",
+    "isort>=5.13.2",
+    "mypy>=1.11.1",
+    "pylint>=3.2.6",
+    "pytest>=8.3.2",
+    "pytest-cov>=5.0.0",
+    "pytest-mock>=3.14.0",
+    "responses>=0.25.3",
+    "ruff>=0.5.7",
+    "tox>=4.17.1",
+    "twine>=5.1.1"
 ]
 docs = [
-    "mkdocs-material>=9.1.21",
-    "mkdocs-minify-plugin>=0.7.1"
+    "mkdocs-material>=9.5.31",
+    "mkdocs-minify-plugin>=0.8.0"
 ]
 
 [project.urls]

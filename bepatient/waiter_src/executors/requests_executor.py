@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from requests import PreparedRequest, Request, Response, Session
 from requests.exceptions import RequestException
@@ -83,22 +84,25 @@ class RequestsExecutor(Executor):
 
         Raises:
             ExecutorIsNotReady: If the executor is not ready to send the request."""
+        run_uuid: str = str(uuid.uuid4())
         if not self._take_from_result:
             try:
                 self._result = self.session.send(
                     request=self.request, timeout=self.timeout
                 )
                 self._input = Curler().to_curl(self._result)
-                log.info("Sent: %s", self._input)
+                log.debug("Sent: %s", self._input)
             except RequestException:
                 log.exception("RequestException! CURL: %s", self._input)
                 return False
         else:
             self._take_from_result = False
 
-        if self._status_code_checker.check(self._result):
+        if self._status_code_checker.check(self._result, run_uuid):
             self._failed_checkers = [
-                checker for checker in self._checkers if not checker.check(self._result)
+                checker
+                for checker in self._checkers
+                if not checker.check(self._result, run_uuid)
             ]
         else:
             self._failed_checkers = [self._status_code_checker]

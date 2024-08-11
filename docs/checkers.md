@@ -35,7 +35,6 @@ To do this, you need an object that inherits from the `Checker` class:
 
 ```python
 import logging
-import uuid
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 
@@ -58,8 +57,8 @@ class Checker(ABC):
         attrs["comparer"] = self.comparer.__name__
 
         return (
-                " | ".join([f"{k.capitalize()}: {v}" for k, v in sorted(attrs.items())])
-                + f" | Data: {self._prepared_data}"
+            " | ".join([f"{k.capitalize()}: {v}" for k, v in sorted(attrs.items())])
+            + f" | Data: {self._prepared_data}"
         )
 
     @abstractmethod
@@ -73,26 +72,26 @@ class Checker(ABC):
         Returns:
             Any: Data for comparison."""
 
-    def check(self, data: Any) -> bool:
+    def check(self, data: Any, run_uuid: str) -> bool:
         """Check if the given data meets a certain condition.
 
         Args:
             data (Any): The data to be checked.
+            run_uuid (str): unique run identifier.
 
         Returns:
             bool: True if the condition is met, False otherwise."""
-        run_uuid = str(uuid.uuid4())
         log.debug("Check uuid: %s | %s", run_uuid, self)
 
         self._prepared_data = self.prepare_data(data, run_uuid)
         if self.comparer(self._prepared_data, self.expected_value):
+            log.debug(
+                "Check success! | uuid: %s | %s",
+                run_uuid,
+                self,
+            )
             return True
-        log.info(
-            "Check uuid: %s | Condition not met | Expected: %s | Data: %s",
-            run_uuid,
-            self.expected_value,
-            self._prepared_data,
-        )
+        log.info("Check uuid: %s | Condition not met | %s", run_uuid, self)
         return False
 ```
 
