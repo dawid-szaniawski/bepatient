@@ -1,5 +1,5 @@
 site_name: bepatient
-site_url: https://dawid-szaniawski.github.io/bepatient
+site_url: https://bepatient.webludus.pl/
 site_dir: site/docs
 site_author: Dawid Szaniawski
 site_description: A library facilitating work with asynchronous APIs

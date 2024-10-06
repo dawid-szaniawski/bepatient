@@ -68,7 +68,7 @@ docs = [
 
 [project.urls]
 Source = "https://github.com/dawid-szaniawski/bepatient"
-Documentation = "https://webludus.pages.dev/"
+Documentation = "https://bepatient.webludus.pl/"
 
 [tool.setuptools]
 include-package-data = true
