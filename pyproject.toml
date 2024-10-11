@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "A library facilitating work with asynchronous APIs"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "Dawid Szaniawski", email = "webluduspl@gmail.com" }]
+authors = [{ name = "Dawid Szaniawski", email = "dszaniawski@webludus.pl" }]
 license = { file = "LICENSE" }
 dependencies = [
     "dictor>=0.1.12",
@@ -67,6 +67,7 @@ docs = [
 ]
 
 [project.urls]
+Homepage = "https://webludus.pl/en"
 Source = "https://github.com/dawid-szaniawski/bepatient"
 Documentation = "https://bepatient.webludus.pl/"
 
