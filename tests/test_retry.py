@@ -54,13 +54,16 @@ class TestRetry:
         self, comparator: Comparator, expected: Any, mocker: MockerFixture
     ):
         @retry(expected=expected, comparer=comparator, delay=0)
-        def simple_function():
-            return requests.get("https://webludus.pl", timeout=1).status_code
+        def simple_function() -> int | None:
+            try:
+                return requests.get("https://webludus.pl", timeout=1).status_code
+            except AssertionError:
+                return None
 
         res1 = requests.Response()
         res1.status_code = 404
         res2 = requests.Response()
         res2.status_code = 200
 
-        mocker.patch("requests.get", side_effect=[res1, res2])
+        mocker.patch("requests.get", side_effect=[AssertionError(), res1, res2])
         assert simple_function() == 200
