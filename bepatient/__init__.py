@@ -6,6 +6,7 @@ from logging import NullHandler
 from .api import (
     RequestsWaiter,
     dict_differences,
+    str_to_bool,
     to_curl,
     wait_for_value_in_request,
     wait_for_values_in_request,
@@ -22,6 +23,7 @@ __all__ = [
     "COMPARATORS",
     "dict_differences",
     "retry",
+    "str_to_bool",
     "RequestsWaiter",
     "to_curl",
     "wait_for_values_in_request",

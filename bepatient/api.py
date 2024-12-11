@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from requests import PreparedRequest, Request, Response, Session
@@ -346,3 +347,44 @@ def to_curl(req_or_res: PreparedRequest | Response, charset: str | None = None) 
     Returns:
         the `curl` command as a string"""
     return Curler().to_curl(req_or_res, charset)
+
+
+def str_to_bool(value: str) -> bool:
+    """
+    TODO: docs
+    """
+    match value.lower():
+        case "y" | "yes" | "t" | "true" | "on" | "1":
+            return True
+        case "n" | "no" | "f" | "false" | "off" | "0":
+            return False
+        case _:
+            raise ValueError(f"Invalid boolean value: {value}")
+
+
+def find_uuid_in_text(text: str) -> str:
+    return re.compile(
+        '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
+    ).findall(text)[0]
+
+
+def sort_lists_in_dict(to_sort: dict[str, Any]) -> dict[str, Any]:
+    for key, value in to_sort.copy().items():
+        if isinstance(value, list | tuple):
+            to_sort[key] = sorted(value)
+        else:
+            to_sort[key] = value
+    return to_sort
+
+
+def delete_none_values_from_dict(to_delete: dict[str, Any]) -> dict[str, Any]:
+    for key, value in to_delete.copy().items():
+        if value is None:
+            del to_delete[key]
+    return to_delete
+
+
+def extract_url_params(url_address: str) -> dict[str, Any]:
+    return dict(
+        param.split("=") for param in url_address.split("?")[1].split("&")
+    )

@@ -10,6 +10,7 @@ from responses import RequestsMock
 from bepatient import (
     RequestsWaiter,
     dict_differences,
+    str_to_bool,
     to_curl,
     wait_for_value_in_request,
     wait_for_values_in_request,
@@ -632,3 +633,32 @@ def test_to_curl(prepared_request: PreparedRequest):
     )
 
     assert to_curl(prepared_request) == expected_curl
+
+
+class TestStrToBool:
+    @pytest.mark.parametrize(
+        "value,expected",
+        [
+            ("y", True),
+            ("yes", True),
+            ("yeS", True),
+            ("t", True),
+            ("true", True),
+            ("True", True),
+            ("on", True),
+            ("1", True),
+            ("n", False),
+            ("no", False),
+            ("f", False),
+            ("false", False),
+            ("FALSE", False),
+            ("off", False),
+            ("0", False),
+        ],
+    )
+    def test_str_to_bool_happy_path(self, value, expected):
+        assert str_to_bool(value) == expected
+
+    def test_raise_value_error_if_cant_match(self):
+        with pytest.raises(ValueError, match=f"Invalid boolean value: TEST"):
+            str_to_bool("TEST")
