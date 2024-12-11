@@ -1,5 +1,5 @@
 from collections.abc import Iterable, Sized
-from typing import Any, Literal
+from typing import Any, Callable, Literal, TypeAlias
 
 
 def is_equal(data: Any, expected_value: Any) -> bool:
@@ -107,6 +107,7 @@ def have_len_lesser(data: Sized, expected_value: int) -> bool:
         return False
 
 
+Comparator: TypeAlias = Callable[[Any, Any], bool]
 COMPARATORS = Literal[
     "is_equal",
     "is_not_equal",

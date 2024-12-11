@@ -10,6 +10,7 @@ from .api import (
     wait_for_value_in_request,
     wait_for_values_in_request,
 )
+from .retry import retry
 from .waiter_src.checkers import CHECKERS
 from .waiter_src.checkers.checker import Checker
 from .waiter_src.comparators import COMPARATORS
@@ -20,6 +21,7 @@ __all__ = [
     "CHECKERS",
     "COMPARATORS",
     "dict_differences",
+    "retry",
     "RequestsWaiter",
     "to_curl",
     "wait_for_values_in_request",
