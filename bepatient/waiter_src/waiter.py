@@ -1,7 +1,7 @@
 import logging
 from time import sleep
 
-from bepatient.waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
+from bepatient.waiter_src.exceptions import WaiterConditionWasNotMet
 from bepatient.waiter_src.executors.executor import Executor
 
 log = logging.getLogger(__name__)

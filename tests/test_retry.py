@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 
 from bepatient import retry
 from bepatient.waiter_src.comparators import Comparator
-from bepatient.waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
+from bepatient.waiter_src.exceptions import WaiterConditionWasNotMet
 
 
 class TestRetry:

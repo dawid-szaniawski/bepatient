@@ -16,7 +16,7 @@ from bepatient import (
 )
 from bepatient.waiter_src.checkers.response_checkers import HeadersChecker
 from bepatient.waiter_src.comparators import is_equal
-from bepatient.waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
+from bepatient.waiter_src.exceptions import WaiterConditionWasNotMet
 
 
 class TestRequestsWaiter:
