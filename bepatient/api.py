@@ -350,6 +350,7 @@ def to_curl(req_or_res: PreparedRequest | Response, charset: str | None = None) 
 
 
 def delete_none_values_from_dict(to_clean: dict[Any, Any]) -> dict[Any, Any]:
+    """Remove all key-value pairs from a dictionary where the value is `None`."""
     new_dict = to_clean.copy()
     for key, value in to_clean.items():
         if value is None:
@@ -358,16 +359,19 @@ def delete_none_values_from_dict(to_clean: dict[Any, Any]) -> dict[Any, Any]:
 
 
 def extract_url_params(url_address: str) -> dict[str, Any]:
+    """Extract query parameters from a URL and return them as a dictionary."""
     return dict(param.split("=") for param in url_address.split("?")[1].split("&"))
 
 
 def find_uuid_in_text(text: str) -> list[str]:
+    """Find all UUIDs in a given text."""
     return re.compile(
         "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
     ).findall(text)
 
 
 def str_to_bool(value: str) -> bool:
+    """Convert a string representation of a boolean to an actual boolean value."""
     match value.lower():
         case "y" | "yes" | "t" | "true" | "on" | "1":
             return True
