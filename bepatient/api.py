@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from requests import PreparedRequest, Request, Response, Session
@@ -346,3 +347,31 @@ def to_curl(req_or_res: PreparedRequest | Response, charset: str | None = None) 
     Returns:
         the `curl` command as a string"""
     return Curler().to_curl(req_or_res, charset)
+
+
+def delete_none_values_from_dict(to_clean: dict[Any, Any]) -> dict[Any, Any]:
+    new_dict = to_clean.copy()
+    for key, value in to_clean.items():
+        if value is None:
+            del new_dict[key]
+    return new_dict
+
+
+def extract_url_params(url_address: str) -> dict[str, Any]:
+    return dict(param.split("=") for param in url_address.split("?")[1].split("&"))
+
+
+def find_uuid_in_text(text: str) -> list[str]:
+    return re.compile(
+        "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"
+    ).findall(text)
+
+
+def str_to_bool(value: str) -> bool:
+    match value.lower():
+        case "y" | "yes" | "t" | "true" | "on" | "1":
+            return True
+        case "n" | "no" | "f" | "false" | "off" | "0":
+            return False
+        case _:
+            raise ValueError(f"Invalid boolean value: {value}")

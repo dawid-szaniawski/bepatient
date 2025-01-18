@@ -1,5 +1,6 @@
 import json
 from typing import Any
+from uuid import uuid4
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -9,7 +10,11 @@ from responses import RequestsMock
 
 from bepatient import (
     RequestsWaiter,
+    delete_none_values_from_dict,
     dict_differences,
+    extract_url_params,
+    find_uuid_in_text,
+    str_to_bool,
     to_curl,
     wait_for_value_in_request,
     wait_for_values_in_request,
@@ -632,3 +637,74 @@ def test_to_curl(prepared_request: PreparedRequest):
     )
 
     assert to_curl(prepared_request) == expected_curl
+
+
+def test_delete_none_values_from_dict():
+    dict_to_clean = {"KeyA": 0, 1: -1, None: 1, "KeyB": None, "Lorem": "Ipsum"}
+    expected = {"KeyA": 0, 1: -1, None: 1, "Lorem": "Ipsum"}
+    assert delete_none_values_from_dict(dict_to_clean) == expected
+
+
+def test_extract_url_params():
+    url_address = "https://webludus.pl?page=1&limit=10&test=true"
+    assert extract_url_params(url_address=url_address) == {
+        "page": "1",
+        "limit": "10",
+        "test": "true",
+    }
+
+
+class TestFindUuidInText:
+    def test_text_with_spaces(self):
+        uuid = str(uuid4())
+
+        assert find_uuid_in_text(
+            f"Lorem ipsum dolor sit amet, consectetur {uuid} adipiscing elit."
+        ) == [uuid]
+
+    def test_text_without_spaces(self):
+        uuid = str(uuid4())
+
+        assert find_uuid_in_text(
+            f"Loremipsumdolorsitamet,consectetur{uuid}adipiscingelit.{uuid}"
+        ) == [uuid, uuid]
+
+    def test_many_uuids_without_spaces(self):
+        uuid_1 = str(uuid4())
+        uuid_2 = str(uuid4())
+        uuid_3 = str(uuid4())
+        uuid_4 = str(uuid4())
+        uuid_5 = str(uuid4())
+
+        assert find_uuid_in_text(
+            f"Loremipsumdolorsitamet{uuid_1}{uuid_2}{uuid_3}Lorem{uuid_4}{uuid_5}"
+        ) == [uuid_1, uuid_2, uuid_3, uuid_4, uuid_5]
+
+
+class TestStrToBool:
+    @pytest.mark.parametrize(
+        "value, expected",
+        [
+            ("y", True),
+            ("yes", True),
+            ("yeS", True),
+            ("t", True),
+            ("true", True),
+            ("True", True),
+            ("on", True),
+            ("1", True),
+            ("n", False),
+            ("no", False),
+            ("f", False),
+            ("false", False),
+            ("FALSE", False),
+            ("off", False),
+            ("0", False),
+        ],
+    )
+    def test_str_to_bool_happy_path(self, value, expected):
+        assert str_to_bool(value) == expected
+
+    def test_raise_value_error_if_cant_match(self):
+        with pytest.raises(ValueError, match="Invalid boolean value: TEST"):
+            str_to_bool("TEST")
