@@ -3,7 +3,7 @@ from time import sleep
 from typing import Any, Callable
 
 from .waiter_src.comparators import Comparator, is_equal
-from .waiter_src.exceptions.waiter_exceptions import WaiterConditionWasNotMet
+from .waiter_src.exceptions import WaiterConditionWasNotMet
 
 logger = logging.getLogger(__name__)
 

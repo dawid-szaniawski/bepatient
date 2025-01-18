@@ -9,7 +9,7 @@ from requests import PreparedRequest, Request, RequestException, Response, Sessi
 from responses import RequestsMock
 
 from bepatient.waiter_src.checkers.checker import Checker
-from bepatient.waiter_src.exceptions.executor_exceptions import ExecutorIsNotReady
+from bepatient.waiter_src.exceptions import ExecutorIsNotReady
 from bepatient.waiter_src.executors.requests_executor import RequestsExecutor
 
 
