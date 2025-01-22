@@ -9,6 +9,7 @@ from requests import PreparedRequest, Request, Response, Session
 from responses import RequestsMock
 
 from bepatient import (
+    Checker,
     RequestsWaiter,
     delete_none_values_from_dict,
     dict_differences,
@@ -19,7 +20,6 @@ from bepatient import (
     wait_for_value_in_request,
     wait_for_values_in_request,
 )
-from bepatient.waiter_src.checkers.checker import Checker
 from bepatient.waiter_src.checkers.response_checkers import (
     HeadersChecker,
     JsonChecker,
