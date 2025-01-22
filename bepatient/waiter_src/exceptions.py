@@ -10,3 +10,7 @@ class WaiterIsNotReady(Exception):
 
 class WaiterConditionWasNotMet(Exception):
     pass
+
+
+class ExceptionConditionNotMet(Exception):
+    pass

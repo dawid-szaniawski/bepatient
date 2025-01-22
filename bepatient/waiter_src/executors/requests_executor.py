@@ -34,7 +34,7 @@ class RequestsExecutor(Executor):
         super().__init__()
         self._result: Response | None = None
         self._take_from_result: bool = False
-        self._status_code_checker = StatusCodeChecker(is_equal, expected_status_code)
+        self.add_pre_condition(StatusCodeChecker(is_equal, expected_status_code))
 
         if timeout:
             self.timeout = timeout
@@ -98,15 +98,9 @@ class RequestsExecutor(Executor):
         else:
             self._take_from_result = False
 
-        if self._status_code_checker.check(self._result, run_uuid):
-            self._failed_checkers = [
-                checker
-                for checker in self._checkers
-                if not checker.check(self._result, run_uuid)
-            ]
-        else:
-            self._failed_checkers = [self._status_code_checker]
-
+        self._failed_checkers = self.conditions_manager.check_all(
+            result=self._result, check_uuid=run_uuid
+        )
         if len(self._failed_checkers) == 0:
             return True
         return False

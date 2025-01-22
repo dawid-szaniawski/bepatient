@@ -9,7 +9,7 @@ from requests import PreparedRequest, Request, RequestException, Response, Sessi
 from responses import RequestsMock
 
 from bepatient.waiter_src.checkers.checker import Checker
-from bepatient.waiter_src.exceptions import ExecutorIsNotReady
+from bepatient.waiter_src.exceptions import ExceptionConditionNotMet, ExecutorIsNotReady
 from bepatient.waiter_src.executors.requests_executor import RequestsExecutor
 
 
@@ -97,7 +97,7 @@ class TestRequestExecutor:
     ):
         executor = RequestsExecutor(
             req_or_res=prepared_request, session=session_mock, expected_status_code=200
-        ).add_checker(checker_true)
+        ).add_main_condition(checker_true)
 
         assert executor.is_condition_met()
 
@@ -113,8 +113,10 @@ class TestRequestExecutor:
                 expected_status_code=200,
                 session=session_mock,
             )
-            .add_checker(checker_true)
-            .add_checker(checker_true)
+            .add_main_condition(checker_true)
+            .add_main_condition(checker_true)
+            .add_pre_condition(checker_true)
+            .add_exception_condition(checker_true)
         )
 
         assert executor.is_condition_met()
@@ -127,7 +129,7 @@ class TestRequestExecutor:
     ):
         executor = RequestsExecutor(
             req_or_res=prepared_request, expected_status_code=200, session=session_mock
-        ).add_checker(checker_false)
+        ).add_main_condition(checker_false)
 
         assert executor.is_condition_met() is False
 
@@ -144,8 +146,8 @@ class TestRequestExecutor:
                 expected_status_code=200,
                 session=session_mock,
             )
-            .add_checker(checker_false)
-            .add_checker(checker_true)
+            .add_main_condition(checker_false)
+            .add_main_condition(checker_true)
         )
 
         assert executor.is_condition_met() is False
@@ -163,7 +165,7 @@ class TestRequestExecutor:
         session.send.return_value = response
         executor = RequestsExecutor(
             req_or_res=prepared_request, expected_status_code=200, session=session
-        ).add_checker(checker_true)
+        ).add_main_condition(checker_true)
 
         assert executor.is_condition_met() is False
 
@@ -188,7 +190,7 @@ class TestRequestExecutor:
         mocked_responses.get(request_object.url, status=200)
         executor = RequestsExecutor(
             req_or_res=request_object, session=session_object, expected_status_code=404
-        ).add_checker(checker_true)
+        ).add_main_condition(checker_true)
 
         executor.is_condition_met()
 
@@ -212,16 +214,17 @@ class TestRequestExecutor:
         mocked_responses.get(request_object.url, status=200)
         executor = RequestsExecutor(
             req_or_res=request_object, session=session_object, expected_status_code=200
-        ).add_checker(checker_false)
+        ).add_main_condition(checker_false)
 
         executor.is_condition_met()
 
         assert executor.error_message() == (
-            "The condition has not been met! | Failed checkers: (I'm falsy)"
+            "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
+            " | Comparer: comparer | Expected_value: TEST | Data: Ok)"
             " | curl -X GET -H 'Content-Type: application/json' -H 'Accept-Language:"
             " en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent: Mozilla/5.0"
-            " (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task: test'"
-            " -H 'Cookie: pytest=fixture; user-token=abc-123' https://webludus.pl/"
+            " (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task: test' -H 'Cookie:"
+            " pytest=fixture; user-token=abc-123' https://webludus.pl/"
         )
 
     def test_error_message_returns_correct_message_multiple_checkers(
@@ -231,15 +234,9 @@ class TestRequestExecutor:
         checker_false: Checker,
         is_equal_comparer: Callable[[Any, Any], bool],
     ):
-        class CheckerMocker(Checker):
-            def __str__(self) -> str:
-                return "I'm even more falsy"
-
-            def prepare_data(self, data: Any, run_uuid: str | None = None) -> None:
-                """mock"""
-
-            def check(self, data: Any, run_uuid: str) -> bool:
-                return False
+        class AnotherChecker(Checker):
+            def prepare_data(self, data: Any, run_uuid: str | None = None) -> str:
+                return "MOCK"
 
         executor = (
             RequestsExecutor(
@@ -247,17 +244,20 @@ class TestRequestExecutor:
                 session=session_mock,
                 expected_status_code=200,
             )
-            .add_checker(checker_false)
-            .add_checker(CheckerMocker(is_equal_comparer, ""))
-            .add_checker(checker_false)
+            .add_main_condition(checker_false)
+            .add_main_condition(AnotherChecker(is_equal_comparer, "Hello"))
+            .add_main_condition(checker_false)
         )
 
         executor.is_condition_met()
 
         assert executor.error_message() == (
-            "The condition has not been met! | Failed checkers:"
-            " (I'm falsy, I'm even more falsy, I'm falsy) | curl -X GET"
-            " -H 'task: test' -H 'Cookie: user-token=abc-123' https://webludus.pl/"
+            "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
+            " | Comparer: comparer | Expected_value: TEST | Data: Ok, Checker:"
+            " AnotherChecker | Comparer: comparer | Expected_value: Hello"
+            " | Data: MOCK, Checker: CheckerMocker | Comparer: comparer"
+            " | Expected_value: TEST | Data: Ok) | curl -X GET -H 'task: test' -H"
+            " 'Cookie: user-token=abc-123' https://webludus.pl/"
         )
 
     def test_error_message_raises_exception_when_condition_has_not_been_checked(
@@ -281,7 +281,7 @@ class TestRequestExecutor:
         res_mock = mocked_responses.get(request_object.url, status=200)
         executor = RequestsExecutor(
             req_or_res=request_object, session=session_object, expected_status_code=200
-        ).add_checker(checker_true)
+        ).add_main_condition(checker_true)
 
         executor.is_condition_met()
 
@@ -346,7 +346,7 @@ class TestRequestExecutor:
         example_response.request = prepared_request
         session = Session()
         session.headers = {"test_name": "test_response_headers_merged_into_session"}
-        expected_headers = session.headers | dict(prepared_request.headers)
+        expected_headers = dict(session.headers) | dict(prepared_request.headers)
         logs = [
             (
                 "bepatient.waiter_src.executors.requests_executor",
@@ -394,3 +394,53 @@ class TestRequestExecutor:
         )
 
         assert executor.timeout == (15, 30)
+
+    def test_conditions_are_checked_in_the_proper_order(
+        self,
+        checker_mocker: type[Checker],
+        checker_true: Checker,
+        example_response: Response,
+        is_equal_comparer: Callable[[Any, Any], bool],
+    ):
+        checker_1 = checker_mocker(comparer=is_equal_comparer, expected_value=1)
+        checker_2 = checker_mocker(comparer=is_equal_comparer, expected_value=2)
+        checker_3 = checker_mocker(comparer=is_equal_comparer, expected_value=3)
+        executor = RequestsExecutor(
+            req_or_res=example_response, expected_status_code=200
+        )
+        executor.conditions_manager.pre_conditions = []
+
+        executor.add_exception_condition(checker_1)
+        executor.add_pre_condition(checker_2)
+        executor.add_main_condition(checker_3)
+
+        msg = (
+            "Failed checkers: Checker: CheckerMocker | Comparer: comparer"
+            " | Expected_value: 1 | Data: Ok"
+        )
+        with pytest.raises(ExceptionConditionNotMet, match=msg):
+            executor.is_condition_met()
+
+        executor.conditions_manager.exception_conditions = [checker_true]
+        assert executor.is_condition_met() is False
+        assert executor.error_message() == (
+            "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
+            " | Comparer: comparer | Expected_value: 2 | Data: Ok) | curl -X GET -H"
+            " 'task: test' -H 'Cookie: user-token=abc-123' -H 'User-Agent:"
+            " python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
+            " */*' -H 'Connection: keep-alive' https://webludus.pl/"
+        )
+
+        executor.conditions_manager.pre_conditions = [checker_true]
+        assert executor.is_condition_met() is False
+        assert executor.error_message() == (
+            "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
+            " | Comparer: comparer | Expected_value: 3 | Data: Ok) | curl -X GET -H"
+            " 'task: test' -H 'Cookie: user-token=abc-123' -H 'User-Agent:"
+            " python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
+            " */*' -H 'Connection: keep-alive' https://webludus.pl/"
+        )
+
+        executor.conditions_manager.main_conditions = [checker_true]
+        assert executor.is_condition_met() is True
+        assert executor.error_message() == "All conditions have been met."

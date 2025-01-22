@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 from bepatient.waiter_src.checkers.checker import Checker
+from bepatient.waiter_src.conditions_manager import ConditionsManager
 from bepatient.waiter_src.exceptions import ExecutorIsNotReady
 
 
@@ -9,15 +10,30 @@ class Executor(ABC):
     """An abstract base class for defining an executor that can be waited for."""
 
     def __init__(self):
-        """Cursor should have cursor_factory that returns dict object"""
-        self._checkers: list[Checker] = []
+        self.conditions_manager = ConditionsManager()
         self._failed_checkers: list[Checker] = []
         self._result: Any = None
         self._input: str | None = None
 
-    def add_checker(self, checker: Checker):
-        """Adds checker function to the list of checkers."""
-        self._checkers.append(checker)
+    def add_exception_condition(self, checker: Checker):
+        """Adds checker function to the condition's manager. If the checker condition
+        is not met, it raises ExceptionConditionNotMet."""
+        self.conditions_manager.exception_conditions.append(checker)
+        return self
+
+    def add_pre_condition(self, checker: Checker):
+        """Adds checker function to the list of pre_conditions - conditions that will
+        be checked before the main ones and after those that may result in an error.
+        For example, when we want to check the response status code before verifying
+        the content of the body."""
+        self.conditions_manager.pre_conditions.append(checker)
+        return self
+
+    def add_main_condition(self, checker: Checker):
+        """Adds checker function to the list of main_conditions in ConditionsManager.
+        These are the main conditions to be met. That which we really care about
+        checking the most."""
+        self.conditions_manager.main_conditions.append(checker)
         return self
 
     @abstractmethod
