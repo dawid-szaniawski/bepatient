@@ -232,12 +232,9 @@ class TestRequestExecutor:
         prepared_request: PreparedRequest,
         session_mock: Session,
         checker_false: Checker,
+        checker_mocker: type[Checker],
         is_equal_comparer: Callable[[Any, Any], bool],
     ):
-        class AnotherChecker(Checker):
-            def prepare_data(self, data: Any, run_uuid: str | None = None) -> str:
-                return "MOCK"
-
         executor = (
             RequestsExecutor(
                 req_or_res=prepared_request,
@@ -245,7 +242,7 @@ class TestRequestExecutor:
                 expected_status_code=200,
             )
             .add_main_condition(checker_false)
-            .add_main_condition(AnotherChecker(is_equal_comparer, "Hello"))
+            .add_main_condition(checker_mocker(is_equal_comparer, "Hello"))
             .add_main_condition(checker_false)
         )
 
@@ -254,8 +251,8 @@ class TestRequestExecutor:
         assert executor.error_message() == (
             "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
             " | Comparer: comparer | Expected_value: TEST | Data: Ok, Checker:"
-            " AnotherChecker | Comparer: comparer | Expected_value: Hello"
-            " | Data: MOCK, Checker: CheckerMocker | Comparer: comparer"
+            " CheckerMocker | Comparer: comparer | Expected_value: Hello"
+            " | Data: Ok, Checker: CheckerMocker | Comparer: comparer"
             " | Expected_value: TEST | Data: Ok) | curl -X GET -H 'task: test' -H"
             " 'Cookie: user-token=abc-123' https://webludus.pl/"
         )
