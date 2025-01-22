@@ -8,6 +8,8 @@ from requests import PreparedRequest, Request, Response, Session
 from requests.models import CaseInsensitiveDict
 from responses import RequestsMock
 
+from bepatient import Checker
+
 
 @pytest.fixture
 def mocked_responses() -> RequestsMock:  # type: ignore
@@ -134,3 +136,26 @@ def error_msg() -> str:
         " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
         " https://webludus.pl/"
     )
+
+
+@pytest.fixture
+def checker_mocker() -> type[Checker]:
+    class CheckerMocker(Checker):
+        def prepare_data(self, data: Any, run_uuid: str | None = None) -> str:
+            return "Ok"
+
+    return CheckerMocker
+
+
+@pytest.fixture
+def checker_true(
+    checker_mocker: type[Checker], is_equal_comparer: Callable[[Any, Any], bool]
+) -> Checker:
+    return checker_mocker(comparer=is_equal_comparer, expected_value="Ok")
+
+
+@pytest.fixture
+def checker_false(
+    checker_mocker: type[Checker], is_equal_comparer: Callable[[Any, Any], bool]
+) -> Checker:
+    return checker_mocker(comparer=is_equal_comparer, expected_value="TEST")

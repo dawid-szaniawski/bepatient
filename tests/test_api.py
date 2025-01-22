@@ -9,6 +9,7 @@ from requests import PreparedRequest, Request, Response, Session
 from responses import RequestsMock
 
 from bepatient import (
+    Checker,
     RequestsWaiter,
     delete_none_values_from_dict,
     dict_differences,
@@ -19,9 +20,16 @@ from bepatient import (
     wait_for_value_in_request,
     wait_for_values_in_request,
 )
-from bepatient.waiter_src.checkers.response_checkers import HeadersChecker
-from bepatient.waiter_src.comparators import is_equal
-from bepatient.waiter_src.exceptions import WaiterConditionWasNotMet
+from bepatient.waiter_src.checkers.response_checkers import (
+    HeadersChecker,
+    JsonChecker,
+    StatusCodeChecker,
+)
+from bepatient.waiter_src.comparators import is_equal, is_not_equal
+from bepatient.waiter_src.exceptions import (
+    ExceptionConditionNotMet,
+    WaiterConditionWasNotMet,
+)
 
 
 class TestRequestsWaiter:
@@ -33,35 +41,66 @@ class TestRequestsWaiter:
         assert executor.request == prepared_request
         assert executor.session is session_mock
 
-        checker = executor._status_code_checker
+        checker = executor.conditions_manager.pre_conditions[0]
         assert checker.expected_value == 201
 
     def test_add_checker(self, prepared_request: PreparedRequest):
         waiter = RequestsWaiter(request=prepared_request)
-        executor = waiter.add_checker(
-            expected_value="TEST",
+
+        waiter.add_checker(
+            expected_value="TEST_1",
             comparer="is_equal",
             checker="headers_checker",
             dict_path="dict",
             search_query="search",
-        ).executor
-
-        checker = HeadersChecker(
-            comparer=is_equal,
-            expected_value="TEST",
-            dict_path="dict",
-            search_query="search",
+        ).add_checker(
+            expected_value="TEST_2",
+            comparer="is_not_equal",
+            checker="json_checker",
+            dict_path="dict_2",
+            search_query="search_2",
+            condition_level="exception",
+        ).add_checker(
+            expected_value="TEST_3",
+            comparer="is_equal",
+            checker="json_checker",
+            dict_path="dict_3",
+            search_query="search_3",
+            condition_level="pre",
         )
 
-        assert executor._checkers[0].__dict__ == checker.__dict__
-
-    def test_add_custom_checker(self, prepared_request: PreparedRequest):
-        checker = HeadersChecker(isinstance, dict)
-        waiter = RequestsWaiter(request=prepared_request)
-        executor = waiter.add_custom_checker(checker).executor
-        w_checker = executor._checkers[0]
-
-        assert w_checker is checker
+        conditions_manager = waiter.executor.conditions_manager
+        assert (
+            conditions_manager.main_conditions[0].__dict__
+            == HeadersChecker(
+                comparer=is_equal,
+                expected_value="TEST_1",
+                dict_path="dict",
+                search_query="search",
+            ).__dict__
+        )
+        assert (
+            conditions_manager.exception_conditions[0].__dict__
+            == JsonChecker(
+                comparer=is_not_equal,
+                expected_value="TEST_2",
+                dict_path="dict_2",
+                search_query="search_2",
+            ).__dict__
+        )
+        assert (
+            conditions_manager.pre_conditions[0].__dict__
+            == StatusCodeChecker(comparer=is_equal, expected_value=200).__dict__
+        )
+        assert (
+            conditions_manager.pre_conditions[1].__dict__
+            == JsonChecker(
+                comparer=is_equal,
+                expected_value="TEST_3",
+                dict_path="dict_3",
+                search_query="search_3",
+            ).__dict__
+        )
 
     def test_happy_path_prepared_request(
         self,
@@ -348,6 +387,30 @@ class TestRequestsWaiter:
         waiter = RequestsWaiter(request=prepared_request, session=session_mock)
         waiter.add_checker(expected_value=False, comparer="is_equal", dict_path="ok")
         waiter.run(retries=1, raise_error=False)
+
+        assert waiter.get_result() == example_response
+
+    def test_exception_conditions_raise_error(
+        self,
+        checker_true: Checker,
+        example_response: Response,
+        prepared_request: PreparedRequest,
+        session_mock: Session,
+    ):
+        waiter = RequestsWaiter(request=prepared_request, session=session_mock)
+        waiter.add_checker(
+            expected_value=False,
+            comparer="is_equal",
+            dict_path="ok",
+            condition_level="exception",
+        ).add_custom_checker(checker_true)
+        msg = (
+            "Failed checkers: Checker: JsonChecker | Comparer: is_equal"
+            " | Dictor_fallback: None | Expected_value: False | Ignore_case: False"
+            " | Path: ok | Search_query: None | Data: True"
+        )
+        with pytest.raises(ExceptionConditionNotMet, match=msg):
+            waiter.run(retries=1)
 
         assert waiter.get_result() == example_response
 

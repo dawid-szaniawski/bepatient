@@ -7,6 +7,7 @@ from .curler import Curler
 from .waiter_src import comparators
 from .waiter_src.checkers import CHECKERS, RESPONSE_CHECKERS
 from .waiter_src.checkers.checker import Checker
+from .waiter_src.conditions_manager import CONDITION_LEVEL
 from .waiter_src.executors.requests_executor import RequestsExecutor
 from .waiter_src.waiter import wait_for_executor
 
@@ -58,8 +59,9 @@ class RequestsWaiter:
         dict_path: str | None = None,
         search_query: str | None = None,
         ignore_case: bool = False,
+        condition_level: CONDITION_LEVEL = "main",
     ):
-        """Add a response checker to the waiter.
+        """Add a response checker (main_condition) to the waiter.
 
         Args:
             expected_value (Any): The value to be compared against the response data.
@@ -73,32 +75,49 @@ class RequestsWaiter:
                 in the response data. Defaults to None.
             ignore_case (bool, optional): If set, upper/lower-case keys in dict_path
                 are treated the same. Defaults to False.
+            condition_level (CONDITION_LEVEL, optional): specifies, on what stage of
+                validation, that condition should be checked.
 
         Returns:
             self: updated RequestsWaiter instance."""
-        self.executor.add_checker(
-            RESPONSE_CHECKERS[checker](  # type: ignore
-                comparer=getattr(comparators, comparer),
-                expected_value=expected_value,
-                dict_path=dict_path,
-                search_query=search_query,
-                ignore_case=ignore_case,
-            )
+        checker = RESPONSE_CHECKERS[checker](  # type: ignore
+            comparer=getattr(comparators, comparer),
+            expected_value=expected_value,
+            dict_path=dict_path,
+            search_query=search_query,
+            ignore_case=ignore_case,
+        )
+        self.add_custom_checker(
+            checker=checker, condition_level=condition_level  # type: ignore
         )
         return self
 
-    def add_custom_checker(self, checker: Checker):
-        """Add a custom response checker to the waiter.
+    def add_custom_checker(
+        self, checker: Checker, condition_level: CONDITION_LEVEL = "main"
+    ):
+        """Add a custom response checker (main_condition) to the waiter.
         This method allows users to add their own custom response checker by providing
         an object that inherits from the abstract base class Checker.
 
         Args:
             checker (Checker): An instance of a custom checker object that inherits
                 from the Checker class.
+            condition_level (CONDITION_LEVEL, optional): specifies, on what stage of
+                validation, that condition should be checked.
 
         Returns:
             self: updated RequestsWaiter instance."""
-        self.executor.add_checker(checker)
+        match condition_level:
+            case "exception":
+                self.executor.add_exception_condition(checker)
+            case "pre":
+                self.executor.add_pre_condition(checker)
+            case "main":
+                self.executor.add_main_condition(checker)
+            case _:
+                raise ValueError(
+                    "You have to choose between 'exception', 'pre' and 'main'!"
+                )
         return self
 
     def run(self, retries: int = 60, delay: int = 1, raise_error: bool = True):
@@ -232,6 +251,8 @@ def wait_for_values_in_request(
                     value in the response data. Defaults to None.
                - ignore_case (bool, optional): If set, upper/lower-case keys in
                     dict_path are treated the same. Defaults to False.
+               - condition_level (CONDITION_LEVEL, optional): specifies, on what stage
+                    of validation, that condition should be checked.
         status_code (int, optional): The expected HTTP status code. Defaults to 200.
         session (Session | None, optional): The requests session to use for sending
                requests. Defaults to None.
@@ -257,6 +278,7 @@ def wait_for_values_in_request(
                    "comparer": "have_len_greater",
                    "expected_value": 0,
                    "dict_path": "data",
+                   "condition_level" = "pre"
                },
                {
                    "checker": "json_checker",
