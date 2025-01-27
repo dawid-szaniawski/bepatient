@@ -17,7 +17,7 @@ def retry(
     Example:
         ```python
             @bepatient.retry(200)
-            def send_request():
+            def send_request() -> int:
                 return requests.get('https://webludus.pl/en').status_code
 
             result = send_request()

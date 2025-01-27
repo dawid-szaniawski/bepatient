@@ -3,7 +3,7 @@ from _pytest.logging import LogCaptureFixture
 
 from bepatient import Checker
 from bepatient.waiter_src.conditions_manager import ConditionsManager
-from bepatient.waiter_src.exceptions import ExceptionConditionNotMet
+from bepatient.waiter_src.exceptions import ExceptionConditionNotMet, WaiterIsNotReady
 
 
 class TestConditionsManager:
@@ -59,3 +59,8 @@ class TestConditionsManager:
         result = manager.check_all("RESULT", "UUID")
 
         assert result == [checker_false]
+
+    def test_raise_waiter_is_not_ready_if_conditions_are_not_specified(self):
+        manager = ConditionsManager()
+        with pytest.raises(WaiterIsNotReady, match="No conditions defined"):
+            manager.check_all("RESULT", "UUID")

@@ -87,10 +87,9 @@ class RequestsWaiter:
             search_query=search_query,
             ignore_case=ignore_case,
         )
-        self.add_custom_checker(
+        return self.add_custom_checker(
             checker=checker, condition_level=condition_level  # type: ignore
         )
-        return self
 
     def add_custom_checker(
         self, checker: Checker, condition_level: CONDITION_LEVEL = "main"
