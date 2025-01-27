@@ -19,7 +19,7 @@ achieved.
 - Flexible comparison using various checkers and comparers.
 - Configure multiple conditions to be met by response.
 - Inspect various aspects of the response (body, status code, headers).
-- Detailed logs, facilitating the analysis of the test process.
+- Detailed logs (containing cURLs), facilitating the analysis of the test process.
 - Retry mechanism with customizable retries and delay.
 
 ## Installation
@@ -97,7 +97,7 @@ assert response.status_code == 200
 
 MIT License
 
-Copyright (c) 2023-2024 Dawid Szaniawski
+Copyright (c) 2023-present Dawid Szaniawski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

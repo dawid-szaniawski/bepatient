@@ -9,8 +9,9 @@
 
 # Be Patient
 
-_bepatient_ is a library aimed at facilitating work with asynchronous applications. It 
-allows for the repeated execution of specific actions until the desired effect is achieved.
+_bepatient_ is a library aimed at facilitating work with asynchronous applications. It
+allows for the repeated execution of specific actions until the desired effect is
+achieved.
 
 ## Features
 
@@ -18,7 +19,7 @@ allows for the repeated execution of specific actions until the desired effect i
 - Flexible comparison using various checkers and comparers.
 - Configure multiple conditions to be met by response.
 - Inspect various aspects of the response (body, status code, headers).
-- Detailed logs, facilitating the analysis of the test process.
+- Detailed logs (containing cURLs), facilitating the analysis of the test process.
 - Retry mechanism with customizable retries and delay.
 
 ## Installation
@@ -32,6 +33,24 @@ pip install bepatient
 _bepatient_ supports Python 3.10+
 
 ## Basic Usage
+
+Using RequestsWaiter object:
+
+```python
+from requests import get
+
+from bepatient import RequestsWaiter
+
+waiter = RequestsWaiter(request=get("https://example.com/api"))
+waiter.add_checker(comparer="contain", expected_value="string")
+waiter.run()
+
+response = waiter.get_result()
+
+assert response.status_code == 200
+```
+
+Simple way:
 
 ```python
 from requests import get

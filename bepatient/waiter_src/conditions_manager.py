@@ -2,7 +2,7 @@ import logging
 from typing import Any, Literal
 
 from bepatient.waiter_src.checkers.checker import Checker
-from bepatient.waiter_src.exceptions import ExceptionConditionNotMet
+from bepatient.waiter_src.exceptions import ExceptionConditionNotMet, WaiterIsNotReady
 
 log = logging.getLogger(__name__)
 CONDITION_LEVEL = Literal["exception", "pre", "main"]  # pylint: disable=invalid-name
@@ -22,6 +22,10 @@ class ConditionsManager:
 
     def check_all(self, result: Any, check_uuid: str) -> list[Checker]:
         """Simply checks all defined conditions."""
+        if not any(
+            (self.exception_conditions, self.pre_conditions, self.main_conditions)
+        ):
+            raise WaiterIsNotReady("No conditions defined")
         if not self.main_conditions:
             log.info("No main conditions available")
 
