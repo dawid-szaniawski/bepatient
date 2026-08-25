@@ -12,11 +12,17 @@ class Curler:
 
     # noinspection PyUnresolvedReferences
     @staticmethod
-    def _prepare_headers(data: dict[str, Any] | CaseInsensitiveDict[str]) -> str:
-        headers = " ".join(
-            (f"-H {quote(f'{name}: {value}')}" for name, value in data.items())
-        )
-        return f" {headers}" if len(headers) > 0 else ""
+    def _prepare_headers(
+        data: dict[str, Any] | CaseInsensitiveDict[str | bytes], charset: str
+    ) -> str:
+        parts: list[str] = []
+        for name, value in data.items():
+            if isinstance(value, bytes):
+                value = value.decode(charset)
+            parts.append(f"-H {quote(f'{name}: {value}')}")
+        headers = " ".join(parts)
+
+        return f" {headers}" if headers else ""
 
     @staticmethod
     def _prepare_body(data: str | bytes, charset: str) -> str:
@@ -48,9 +54,9 @@ class Curler:
                 del request.headers["content-length"]
 
         curl_command = f"curl -X {quote(request.method)}"  # type: ignore
-        curl_command += self._prepare_headers(request.headers)
+        curl_command += self._prepare_headers(request.headers, charset)
 
-        if request.body:
+        if isinstance(request.body, (str, bytes)):
             curl_command += self._prepare_body(request.body, charset)
 
         curl_command += f" {request.url}"

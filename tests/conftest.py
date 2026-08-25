@@ -1,11 +1,12 @@
 # pylint: disable=redefined-outer-name
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 from pytest_mock import MockerFixture
 from requests import PreparedRequest, Request, Response, Session
-from requests.models import CaseInsensitiveDict
+from requests.structures import CaseInsensitiveDict
 from responses import RequestsMock
 
 from bepatient import Checker
@@ -104,9 +105,9 @@ def session_mock(
 
 
 @pytest.fixture
-def session_object(example_request_headers: dict[str, str | bytes]) -> Session:
+def session_object(example_request_headers: dict[str, str]) -> Session:
     session = Session()
-    session.headers = example_request_headers
+    session.headers = example_request_headers  # type: ignore[assignment]
     session.cookies["pytest"] = "fixture"
     return session
 

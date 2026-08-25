@@ -7,21 +7,21 @@ from bepatient import (
     wait_for_values_in_request,
 )
 
+POKE_MESSAGE = (
+    "Moves cannot score critical hits against this Pokémon.\n\n"
+    "This ability functions identically to Shell Armor."
+)
+
 
 @pytest.mark.e2e
 class TestRequestsWaiter:
     def test_pokeapi(self):
-        msg = (
-            "Moves cannot score critical hits against this Pokémon.\n\n"
-            "This ability functions identically to shell armor."
-        )
-
         waiter = RequestsWaiter(
             request=get("https://pokeapi.co/api/v2/ability/battle-armor", timeout=5)
         )
         waiter.add_checker(
             comparer="contain_all",
-            expected_value=(msg,),
+            expected_value=(POKE_MESSAGE,),
             dict_path="effect_entries",
             search_query="effect",
         )
@@ -33,10 +33,6 @@ class TestRequestsWaiter:
         assert response.json()["name"] == "battle-armor"
 
     def test_pokeapi_multiple_checkers(self):
-        msg = (
-            "Moves cannot score critical hits against this Pokémon.\n\n"
-            "This ability functions identically to shell armor."
-        )
         response = (
             RequestsWaiter(
                 request=get(
@@ -44,7 +40,7 @@ class TestRequestsWaiter:
                 ),
             )
             .add_checker(
-                expected_value=(msg,),
+                expected_value=(POKE_MESSAGE,),
                 comparer="contain_all",
                 dict_path="effect_entries",
                 search_query="effect",
@@ -66,14 +62,10 @@ class TestRequestsWaiter:
 @pytest.mark.e2e
 class TestWaitForValueInRequest:
     def test_pokeapi(self):
-        msg = (
-            "Moves cannot score critical hits against this Pokémon.\n\n"
-            "This ability functions identically to shell armor."
-        )
         response = wait_for_value_in_request(
             request=get("https://pokeapi.co/api/v2/ability/battle-armor", timeout=5),
             comparer="contain_all",
-            expected_value=(msg,),
+            expected_value=(POKE_MESSAGE,),
             checker="json_checker",
             dict_path="effect_entries",
             search_query="effect",
@@ -85,15 +77,11 @@ class TestWaitForValueInRequest:
 @pytest.mark.e2e
 class TestWaitForValuesInRequest:
     def test_pokeapi(self):
-        msg = (
-            "Moves cannot score critical hits against this Pokémon.\n\n"
-            "This ability functions identically to shell armor."
-        )
         list_of_checkers = [
             {
                 "checker": "json_checker",
                 "comparer": "contain_all",
-                "expected_value": (msg,),
+                "expected_value": (POKE_MESSAGE,),
                 "dict_path": "effect_entries",
                 "search_query": "effect",
             },

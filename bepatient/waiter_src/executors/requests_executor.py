@@ -68,6 +68,9 @@ class RequestsExecutor(Executor):
         if self.session.cookies:
             log.debug("Merging session.cookies into PreparedRequest object")
             req_cookies = self.request.headers.get("Cookie", "")
+
+            if isinstance(req_cookies, bytes):
+                req_cookies = req_cookies.decode("utf-8")
             if req_cookies:
                 log.debug("PreparedRequest already has cookies")
                 req_cookies = req_cookies + "; "
@@ -101,6 +104,4 @@ class RequestsExecutor(Executor):
         self._failed_checkers = self.conditions_manager.check_all(
             result=self._result, check_uuid=run_uuid
         )
-        if len(self._failed_checkers) == 0:
-            return True
-        return False
+        return len(self._failed_checkers) == 0

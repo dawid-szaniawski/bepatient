@@ -59,9 +59,7 @@ from requests import get
 from bepatient import wait_for_value_in_request
 
 response = wait_for_value_in_request(
-    request=get("https://example.com/api"),
-    comparer="contain",
-    expected_value="string"
+    request=get("https://example.com/api"), comparer="contain", expected_value="string"
 )
 assert response.status_code == 200
 ```
@@ -111,9 +109,7 @@ from requests import get
 from bepatient import wait_for_value_in_request
 
 response = wait_for_value_in_request(
-    request=get("https://example.com/api"),
-    comparer="contain",
-    expected_value="string"
+    request=get("https://example.com/api"), comparer="contain", expected_value="string"
 )
 assert response.status_code == 200
 ```
@@ -256,7 +252,7 @@ waiter.add_checker(
     expected_value=0,
     comparer="have_len_greater",
     checker="json_checker",
-    dict_path="data"
+    dict_path="data",
 )
 
 # Run the waiter and monitor the response
@@ -265,7 +261,6 @@ response = waiter.run(retries=5, delay=2).get_result()
 # Access the final response containing the expected values
 print(response)
 # <Response [200]>
-
 ```
 
 ---
@@ -290,7 +285,7 @@ import requests
 
 @bepatient.retry(200)
 def send_request() -> int:
-    return requests.get('https://example.com').status_code
+    return requests.get("https://example.com").status_code
 
 
 result = send_request()

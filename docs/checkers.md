@@ -114,7 +114,6 @@ from bepatient import Checker
 class IsListChecker(Checker):
     def prepare_data(self, data: Any, run_uuid: str | None = None) -> Any:
         return type(data)
-
 ```
 
 ---
