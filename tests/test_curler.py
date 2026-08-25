@@ -101,3 +101,14 @@ class TestRequestCurl:
         )
 
         assert Curler().to_curl(response) == curl
+
+    def test_request_headers_with_bytes(self):
+        request = PreparedRequest()
+        request.prepare(
+            method="get",
+            url="https://webludus.pl",
+            headers={"Authorization": b"Bearer secret"},
+        )
+        curl = Curler().to_curl(request)
+        assert "Bearer secret" in curl
+        assert "b'Bearer" not in curl

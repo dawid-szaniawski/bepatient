@@ -21,8 +21,10 @@ class TestRetry:
             (
                 "bepatient.retry",
                 20,
-                "Checking whether the condition has been met. The 1 approach."
-                " Expected: 1",
+                (
+                    "Checking whether the condition has been met. The 1 approach."
+                    " Expected: 1"
+                ),
             ),
             ("bepatient.retry", 20, "Condition met! Result: 1"),
         ]
@@ -39,8 +41,10 @@ class TestRetry:
             (
                 "bepatient.retry",
                 20,
-                "Checking whether the condition has been met. The 1 approach."
-                " Expected: TEST",
+                (
+                    "Checking whether the condition has been met. The 1 approach."
+                    " Expected: TEST"
+                ),
             ),
             ("bepatient.retry", 20, "Condition was not met! Expected: TEST | Result 1"),
         ]

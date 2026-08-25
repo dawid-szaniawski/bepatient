@@ -101,8 +101,7 @@ class JsonChecker(Checker):
                 ignorecase=self.ignore_case,
             )
             log.debug(
-                "Check uuid: %s | Dictor path: %s"
-                " | Dictor search: %s | Dictor data: %s",
+                "Check uuid: %s | Dictor path: %s | Dictor search: %s | Dictor data: %s",
                 run_uuid,
                 self.path,
                 self.search_query,

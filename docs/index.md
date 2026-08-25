@@ -59,9 +59,7 @@ from bepatient import wait_for_value_in_request
 
 
 response = wait_for_value_in_request(
-    request=get("https://example.com/api"),
-    comparer="contain",
-    expected_value="string"
+    request=get("https://example.com/api"), comparer="contain", expected_value="string"
 )
 assert response.status_code == 200
 ```
@@ -75,11 +73,7 @@ from bepatient import wait_for_values_in_request
 
 
 list_of_checkers = [
-    {
-        "checker": "json_checker",
-        "comparer": "contain",
-        "expected_value": "string"
-    },
+    {"checker": "json_checker", "comparer": "contain", "expected_value": "string"},
     {
         "checker": "headers_checker",
         "comparer": "is_equal",

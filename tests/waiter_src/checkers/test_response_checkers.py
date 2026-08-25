@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from json import JSONDecodeError
-from typing import Any, Callable
+from typing import Any
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -34,11 +35,13 @@ class TestStatusCodeChecker:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
-                "Check uuid: None | Response status code: 200 | Response content:"
-                ' b\'{"list_of_dicts": [{"name": "John", "age": 30},'
-                ' {"name": "Mike", "age": 15}], "ok": true, "some_number": 123,'
-                ' "list": ["1", "2", "3"], "none": null, "empty": "", "false": false,'
-                ' "name": "Jack", "City": "Cracow"}\'',
+                (
+                    "Check uuid: None | Response status code: 200 | Response content:"
+                    ' b\'{"list_of_dicts": [{"name": "John", "age": 30},'
+                    ' {"name": "Mike", "age": 15}], "ok": true, "some_number": 123,'
+                    ' "list": ["1", "2", "3"], "none": null, "empty": "", "false": false,'
+                    ' "name": "Jack", "City": "Cracow"}\''
+                ),
             )
         ]
 
@@ -56,24 +59,30 @@ class TestStatusCodeChecker:
             (
                 "bepatient.waiter_src.checkers.checker",
                 10,
-                "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
-                " | Comparer: comparer | Expected_value: 200 | Data: 200",
+                (
+                    "Check uuid: TestStatusCodeChecker | Checker: StatusCodeChecker"
+                    " | Comparer: comparer | Expected_value: 200 | Data: 200"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
-                "Check uuid: TestStatusCodeChecker | Response status code: 200"
-                ' | Response content: b\'{"list_of_dicts": [{"name": "John", "age": 30}'
-                ', {"name": "Mike", "age": 15}], "ok": true, "some_number": 123, "list"'
-                ': ["1", "2", "3"], "none": null, "empty": "", "false": false'
-                ', "name": "Jack", "City": "Cracow"}\'',
+                (
+                    "Check uuid: TestStatusCodeChecker | Response status code: 200"
+                    ' | Response content: b\'{"list_of_dicts": [{"name": "John", "age": 30}'
+                    ', {"name": "Mike", "age": 15}], "ok": true, "some_number": 123, "list"'
+                    ': ["1", "2", "3"], "none": null, "empty": "", "false": false'
+                    ', "name": "Jack", "City": "Cracow"}\''
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
                 20,
-                "Check success! | uuid: TestStatusCodeChecker"
-                " | Checker: StatusCodeChecker | Comparer: comparer"
-                " | Expected_value: 200 | Data: 200",
+                (
+                    "Check success! | uuid: TestStatusCodeChecker"
+                    " | Checker: StatusCodeChecker | Comparer: comparer"
+                    " | Expected_value: 200 | Data: 200"
+                ),
             ),
         ]
 
@@ -274,8 +283,10 @@ class TestJsonChecker:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 40,
-                "Check uuid: None | Expected: TEST"
-                " | Headers: {'error': 'JSONDecodeError'} | Content b'{ \"name'",
+                (
+                    "Check uuid: None | Expected: TEST"
+                    " | Headers: {'error': 'JSONDecodeError'} | Content b'{ \"name'"
+                ),
             ),
         ]
 
@@ -309,8 +320,10 @@ class TestJsonChecker:
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 40,
-                "Check uuid: None | Expected: TEST | Headers: {'error': 'TypeError'} | "
-                "Content b'{ \"name'",
+                (
+                    "Check uuid: None | Expected: TEST | Headers: {'error': 'TypeError'} | "
+                    "Content b'{ \"name'"
+                ),
             ),
         ]
 
@@ -364,31 +377,39 @@ class TestHeadersChecker:
             (
                 "bepatient.waiter_src.checkers.checker",
                 10,
-                "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
-                " | Dictor_fallback: None | Expected_value: WebLudus.pl"
-                " | Ignore_case: False | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                (
+                    "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
+                    " | Dictor_fallback: None | Expected_value: WebLudus.pl"
+                    " | Ignore_case: False | Path: Server | Search_query: None"
+                    " | Data: WebLudus.pl"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
-                "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
-                " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
-                " 'X-Render-Origin_Server': 'gunicorn'}",
+                (
+                    "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
+                    " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
+                    " 'X-Render-Origin_Server': 'gunicorn'}"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
-                "Check uuid: TEST | Dictor path: Server"
-                " | Dictor search: None | Dictor data: WebLudus.pl",
+                (
+                    "Check uuid: TEST | Dictor path: Server"
+                    " | Dictor search: None | Dictor data: WebLudus.pl"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
                 20,
-                "Check success! | uuid: TEST | Checker: HeadersChecker"
-                " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
-                " | Search_query: None | Data: WebLudus.pl",
+                (
+                    "Check success! | uuid: TEST | Checker: HeadersChecker"
+                    " | Comparer: comparer | Dictor_fallback: None"
+                    " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
+                    " | Search_query: None | Data: WebLudus.pl"
+                ),
             ),
         ]
         # pylint: enable=duplicate-code
@@ -418,31 +439,39 @@ class TestHeadersChecker:
             (
                 "bepatient.waiter_src.checkers.checker",
                 10,
-                "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
-                " | Dictor_fallback: None | Expected_value: example.com"
-                " | Ignore_case: False | Path: Server | Search_query: None"
-                " | Data: WebLudus.pl",
+                (
+                    "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
+                    " | Dictor_fallback: None | Expected_value: example.com"
+                    " | Ignore_case: False | Path: Server | Search_query: None"
+                    " | Data: WebLudus.pl"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
-                "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
-                " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
-                " 'X-Render-Origin_Server': 'gunicorn'}",
+                (
+                    "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
+                    " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
+                    " 'X-Render-Origin_Server': 'gunicorn'}"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
-                "Check uuid: TEST | Dictor path: Server | Dictor search: None"
-                " | Dictor data: WebLudus.pl",
+                (
+                    "Check uuid: TEST | Dictor path: Server | Dictor search: None"
+                    " | Dictor data: WebLudus.pl"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
                 20,
-                "Check uuid: TEST | Condition not met | Checker: HeadersChecker"
-                " | Comparer: comparer | Dictor_fallback: None"
-                " | Expected_value: example.com | Ignore_case: False | Path: Server"
-                " | Search_query: None | Data: WebLudus.pl",
+                (
+                    "Check uuid: TEST | Condition not met | Checker: HeadersChecker"
+                    " | Comparer: comparer | Dictor_fallback: None"
+                    " | Expected_value: example.com | Ignore_case: False | Path: Server"
+                    " | Search_query: None | Data: WebLudus.pl"
+                ),
             ),
         ]
         assert checker.check(data=example_response, run_uuid="TEST") is False

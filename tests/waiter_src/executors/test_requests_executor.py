@@ -1,5 +1,6 @@
 import json
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -302,8 +303,10 @@ class TestRequestExecutor:
             (
                 "bepatient.waiter_src.executors.requests_executor",
                 40,
-                "RequestException! CURL: curl -X GET -H 'task: test' -H 'Cookie: "
-                "user-token=abc-123' https://webludus.pl/",
+                (
+                    "RequestException! CURL: curl -X GET -H 'task: test' -H 'Cookie: "
+                    "user-token=abc-123' https://webludus.pl/"
+                ),
             )
         ]
 
@@ -342,7 +345,9 @@ class TestRequestExecutor:
     ):
         example_response.request = prepared_request
         session = Session()
-        session.headers = {"test_name": "test_response_headers_merged_into_session"}
+        session.headers = {  # type: ignore[assignment]
+            "test_name": "test_response_headers_merged_into_session"
+        }
         expected_headers = dict(session.headers) | dict(prepared_request.headers)
         logs = [
             (
@@ -420,21 +425,22 @@ class TestRequestExecutor:
 
         executor.conditions_manager.exception_conditions = [checker_true]
         assert executor.is_condition_met() is False
-        assert executor.error_message() == (
+
+        assert executor.error_message().replace(", zstd", "") == (
             "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
             " | Comparer: comparer | Expected_value: 2 | Data: Ok) | curl -X GET -H"
             " 'task: test' -H 'Cookie: user-token=abc-123' -H 'User-Agent:"
-            " python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
+            " python-requests/2.34.2' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
             " */*' -H 'Connection: keep-alive' https://webludus.pl/"
         )
 
         executor.conditions_manager.pre_conditions = [checker_true]
         assert executor.is_condition_met() is False
-        assert executor.error_message() == (
+        assert executor.error_message().replace(", zstd", "") == (
             "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
             " | Comparer: comparer | Expected_value: 3 | Data: Ok) | curl -X GET -H"
             " 'task: test' -H 'Cookie: user-token=abc-123' -H 'User-Agent:"
-            " python-requests/2.32.3' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
+            " python-requests/2.34.2' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
             " */*' -H 'Connection: keep-alive' https://webludus.pl/"
         )
 

@@ -29,14 +29,18 @@ class TestConditionsManager:
             (
                 "bepatient.waiter_src.checkers.checker",
                 10,
-                "Check uuid: UUID | Checker: CheckerMocker | Comparer: comparer"
-                " | Expected_value: TEST | Data: Ok",
+                (
+                    "Check uuid: UUID | Checker: CheckerMocker | Comparer: comparer"
+                    " | Expected_value: TEST | Data: Ok"
+                ),
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
                 20,
-                "Check uuid: UUID | Condition not met | Checker: CheckerMocker"
-                " | Comparer: comparer | Expected_value: TEST | Data: Ok",
+                (
+                    "Check uuid: UUID | Condition not met | Checker: CheckerMocker"
+                    " | Comparer: comparer | Expected_value: TEST | Data: Ok"
+                ),
             ),
         ]
 
