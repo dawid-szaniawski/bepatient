@@ -351,13 +351,16 @@ class TestRequestsWaiter:
         mocked_responses.get(
             res.request.url,
             status=200,
-            headers={"Content-Type": "application/json", "Server": "WebLudus.pl"},
+            headers={
+                "Content-Type": "application/json",
+                "Server": "https://webludus.pages.dev/",
+            },
             body=json.dumps(example_dict_content).encode("utf-8"),
         )
 
         waiter = RequestsWaiter(request=res, session=session_object)
         waiter.add_checker(
-            expected_value="WebLudus.pl",
+            expected_value="https://webludus.pages.dev/",
             comparer="is_equal",
             checker="headers_checker",
             dict_path="Server",
@@ -365,11 +368,11 @@ class TestRequestsWaiter:
         error_message = (
             "The condition has not been met!"
             " | Failed checkers: (Checker: HeadersChecker | Comparer: is_equal"
-            " | Dictor_fallback: None | Expected_value: WebLudus.pl"
+            " | Dictor_fallback: None | Expected_value: https://webludus.pages.dev/"
             " | Ignore_case: False | Path: Server | Search_query: None | Data: None)"
             " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123;"
             " pytest=fixture' -H 'Content-Type: application/json' -H 'Accept-Language:"
-            " en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent: Mozilla/5.0"
+            " en-US,en;' -H 'Host: https://webludus.pages.dev/' -H 'User-Agent: Mozilla/5.0"
             " (Windows NT 10.0; rv:120.0) Gecko/20100101' https://webludus.pages.dev/"
         )
         with pytest.raises(WaiterConditionWasNotMet, match=error_message):
