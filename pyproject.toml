@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "A library facilitating work with asynchronous APIs"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "Dawid Szaniawski", email = "dszaniawski@webludus.pl" }]
+authors = [{ name = "Dawid Szaniawski", email = "webluduspl@gmail.com" }]
 license = { file = "LICENSE" }
 dependencies = [
     "dictor>=0.1.12",
@@ -69,9 +69,9 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://webludus.pl/en"
+Homepage = "https://webludus.pages.dev/"
 Source = "https://github.com/dawid-szaniawski/bepatient"
-Documentation = "https://bepatient.webludus.pl/"
+Documentation = "https://webludus.pages.dev/"
 
 [tool.setuptools]
 include-package-data = true
@@ -100,7 +100,7 @@ line_length = 92
 src_paths = ["bepatient", "test"]
 
 [tool.ruff]
-line-length = 92
+line-length = 112
 target-version = "py313"
 ignore = ["UP034", "UP035", "UP040"]
 
@@ -126,5 +126,6 @@ disable = [
     "missing-module-docstring",
     "missing-class-docstring",
     "missing-function-docstring",
-    "protected-access"
+    "protected-access",
+    "line-too-long"
 ]

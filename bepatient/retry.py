@@ -18,7 +18,7 @@ def retry(
         ```python
             @bepatient.retry(200)
             def send_request() -> int:
-                return requests.get('https://webludus.pl/en').status_code
+                return requests.get('https://example.com/').status_code
 
             result = send_request()
             assert result == 200

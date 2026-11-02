@@ -25,7 +25,7 @@ def example_response_headers() -> CaseInsensitiveDict[str]:
     headers: CaseInsensitiveDict[str] = CaseInsensitiveDict()
     headers["Content-Language"] = "en-US"
     headers["Content-Type"] = "application/json"
-    headers["Server"] = "WebLudus.pl"
+    headers["Server"] = "https://webludus.pages.dev/"
     headers["X-Render-Origin_Server"] = "gunicorn"
     return headers
 
@@ -35,7 +35,7 @@ def example_request_headers() -> dict[str, str | bytes]:
     return {
         "Content-Type": "application/json",
         "Accept-Language": "en-US,en;",
-        "Host": "webludus.pl",
+        "Host": "https://webludus.pages.dev/",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101",
     }
 
@@ -59,7 +59,7 @@ def example_dict_content() -> dict[str, Any]:
 def request_object() -> Request:
     return Request(
         method="get",
-        url="https://webludus.pl",
+        url="https://webludus.pages.dev/",
         headers={"task": "test"},
         cookies={"user-token": "abc-123"},
     )
@@ -70,7 +70,7 @@ def prepared_request() -> PreparedRequest:
     request = PreparedRequest()
     request.prepare(
         method="get",
-        url="https://webludus.pl",
+        url="https://webludus.pages.dev/",
         headers={"task": "test"},
         cookies={"user-token": "abc-123"},
     )
@@ -135,7 +135,7 @@ def error_msg() -> str:
         " JsonChecker | Comparer: is_equal | Dictor_fallback: None"
         " | Expected_value: False | Path: ok | Search_query: None | Data: True)"
         " | curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
-        " https://webludus.pl/"
+        " https://webludus.pages.dev/"
     )
 
 

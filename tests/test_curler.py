@@ -7,14 +7,14 @@ class TestRequestCurl:
     def test_request_to_curl(self, prepared_request: PreparedRequest):
         curl = (
             "curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' "
-            "https://webludus.pl/"
+            "https://webludus.pages.dev/"
         )
         assert Curler().to_curl(prepared_request) == curl
 
     def test_request_without_headers_and_body(self):
-        curl = "curl -X GET https://webludus.pl/"
+        curl = "curl -X GET https://webludus.pages.dev/"
         prepared_request = PreparedRequest()
-        prepared_request.prepare(method="get", url="https://webludus.pl")
+        prepared_request.prepare(method="get", url="https://webludus.pages.dev/")
 
         assert Curler().to_curl(prepared_request) == curl
 
@@ -24,7 +24,7 @@ class TestRequestCurl:
         )
         curl = (
             "curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' https://"
-            "webludus.pl/?utm_source=pytest&utm_medium=tests&utm_campaign=bepatient"
+            "webludus.pages.dev/?utm_source=pytest&utm_medium=tests&utm_campaign=bepatient"
         )
 
         assert Curler().to_curl(prepared_request) == curl
@@ -33,7 +33,7 @@ class TestRequestCurl:
         request = PreparedRequest()
         request.prepare(
             method="post",
-            url="https://webludus.pl",
+            url="https://webludus.pages.dev/",
             headers={"task": "test"},
             cookies={"user-token": "abc-123"},
             json={"login": "admin", "password": "admin1"},
@@ -41,7 +41,7 @@ class TestRequestCurl:
         expected_curl = (
             "curl -X POST -H 'task: test' -H 'Cookie: user-token=abc-123'"
             " -H 'Content-Length: 40' -H 'Content-Type: application/json' -d "
-            '\'{"login": "admin", "password": "admin1"}\' https://webludus.pl/'
+            '\'{"login": "admin", "password": "admin1"}\' https://webludus.pages.dev/'
         )
 
         assert Curler().to_curl(request) == expected_curl
@@ -50,7 +50,7 @@ class TestRequestCurl:
         request = PreparedRequest()
         request.prepare(
             method="post",
-            url="https://webludus.pl",
+            url="https://webludus.pages.dev/",
             headers={"task": "test"},
             cookies={"user-token": "abc-123"},
             data={"login": "admin", "password": "admin1"},
@@ -59,7 +59,7 @@ class TestRequestCurl:
             "curl -X POST -H 'task: test' -H 'Cookie: user-token=abc-123'"
             " -H 'Content-Length: 27' -H"
             " 'Content-Type: application/x-www-form-urlencoded'"
-            " -d 'login=admin&password=admin1' https://webludus.pl/"
+            " -d 'login=admin&password=admin1' https://webludus.pages.dev/"
         )
 
         assert Curler().to_curl(request) == expected_curl
@@ -68,13 +68,13 @@ class TestRequestCurl:
         request = PreparedRequest()
         request.prepare(
             method="post",
-            url="https://webludus.pl",
+            url="https://webludus.pages.dev/",
             headers={"Content-Type": "text/plain"},
             json={"PL": "ąćęłńóśźż"},
         )
         expected_curl = (
             "curl -X POST -H 'Content-Type: text/plain' -H 'Content-Length: 64'"
-            ' -d \'{"PL": "ąćęłńóśźż"}\' https://webludus.pl/'
+            ' -d \'{"PL": "ąćęłńóśźż"}\' https://webludus.pages.dev/'
         )
         assert Curler().to_curl(request, charset="unicode-escape") == expected_curl
 
@@ -84,7 +84,7 @@ class TestRequestCurl:
         response.request = prepared_request
         curl = (
             "curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123'"
-            " https://webludus.pl/"
+            " https://webludus.pages.dev/"
         )
 
         assert Curler().to_curl(response) == curl
@@ -97,7 +97,7 @@ class TestRequestCurl:
         response.request = prepared_request
         curl = (
             "curl -X GET -H 'task: test' -H 'Cookie: user-token=abc-123' https://"
-            "webludus.pl/?utm_source=pytest&utm_medium=tests&utm_campaign=bepatient"
+            "webludus.pages.dev/?utm_source=pytest&utm_medium=tests&utm_campaign=bepatient"
         )
 
         assert Curler().to_curl(response) == curl
@@ -106,7 +106,7 @@ class TestRequestCurl:
         request = PreparedRequest()
         request.prepare(
             method="get",
-            url="https://webludus.pl",
+            url="https://webludus.pages.dev/",
             headers={"Authorization": b"Bearer secret"},
         )
         curl = Curler().to_curl(request)

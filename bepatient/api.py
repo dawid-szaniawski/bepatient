@@ -80,7 +80,7 @@ class RequestsWaiter:
 
         Returns:
             self: updated RequestsWaiter instance."""
-        checker_instance = RESPONSE_CHECKERS[checker](  # type: ignore
+        checker_instance = RESPONSE_CHECKERS[checker](
             comparer=getattr(comparators, comparer),
             expected_value=expected_value,
             dict_path=dict_path,
@@ -89,7 +89,7 @@ class RequestsWaiter:
         )
         return self.add_custom_checker(
             checker=checker_instance,
-            condition_level=condition_level,  # type: ignore
+            condition_level=condition_level,
         )
 
     def add_custom_checker(

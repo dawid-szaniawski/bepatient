@@ -269,7 +269,7 @@ class TestJsonChecker:
             raise JSONDecodeError("", "", 1)
 
         response = mocker.MagicMock()
-        response.url = "https://webludus.pl"
+        response.url = "https://webludus.pages.dev//"
         response.status_code = 200
         response.content = bytes('{ "name', "utf-8")
         response.headers = {"error": "JSONDecodeError"}
@@ -306,7 +306,7 @@ class TestJsonChecker:
             raise TypeError("", "", 1)
 
         response = mocker.MagicMock()
-        response.url = "https://webludus.pl"
+        response.url = "https://webludus.pages.dev//"
         response.status_code = 200
         response.content = bytes('{ "name', "utf-8")
         response.headers = {"error": "TypeError"}
@@ -370,7 +370,9 @@ class TestHeadersChecker:
         caplog: LogCaptureFixture,
     ):
         checker = HeadersChecker(
-            comparer=is_equal_comparer, expected_value="WebLudus.pl", dict_path="Server"
+            comparer=is_equal_comparer,
+            expected_value="https://webludus.pages.dev/",
+            dict_path="Server",
         )
         # pylint: disable=duplicate-code
         logs = [
@@ -379,9 +381,9 @@ class TestHeadersChecker:
                 10,
                 (
                     "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
-                    " | Dictor_fallback: None | Expected_value: WebLudus.pl"
+                    " | Dictor_fallback: None | Expected_value: https://webludus.pages.dev/"
                     " | Ignore_case: False | Path: Server | Search_query: None"
-                    " | Data: WebLudus.pl"
+                    " | Data: https://webludus.pages.dev/"
                 ),
             ),
             (
@@ -389,7 +391,7 @@ class TestHeadersChecker:
                 10,
                 (
                     "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
-                    " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
+                    " 'Content-Type': 'application/json', 'Server': 'https://webludus.pages.dev/',"
                     " 'X-Render-Origin_Server': 'gunicorn'}"
                 ),
             ),
@@ -398,7 +400,7 @@ class TestHeadersChecker:
                 10,
                 (
                     "Check uuid: TEST | Dictor path: Server"
-                    " | Dictor search: None | Dictor data: WebLudus.pl"
+                    " | Dictor search: None | Dictor data: https://webludus.pages.dev/"
                 ),
             ),
             (
@@ -407,8 +409,8 @@ class TestHeadersChecker:
                 (
                     "Check success! | uuid: TEST | Checker: HeadersChecker"
                     " | Comparer: comparer | Dictor_fallback: None"
-                    " | Expected_value: WebLudus.pl | Ignore_case: False | Path: Server"
-                    " | Search_query: None | Data: WebLudus.pl"
+                    " | Expected_value: https://webludus.pages.dev/ | Ignore_case: False | Path: Server"
+                    " | Search_query: None | Data: https://webludus.pages.dev/"
                 ),
             ),
         ]
@@ -433,44 +435,46 @@ class TestHeadersChecker:
         caplog: LogCaptureFixture,
     ):
         checker = HeadersChecker(
-            comparer=is_equal_comparer, expected_value="example.com", dict_path="Server"
+            comparer=is_equal_comparer,
+            expected_value="https://example.com/",
+            dict_path="Server",
         )
         logs = [
             (
                 "bepatient.waiter_src.checkers.checker",
                 10,
                 (
-                    "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer"
-                    " | Dictor_fallback: None | Expected_value: example.com"
-                    " | Ignore_case: False | Path: Server | Search_query: None"
-                    " | Data: WebLudus.pl"
+                    "Check uuid: TEST | Checker: HeadersChecker | Comparer: comparer | "
+                    "Dictor_fallback: None | Expected_value: https://example.com/ | Ignore_case: "
+                    "False | Path: Server | Search_query: None | Data: "
+                    "https://webludus.pages.dev/"
                 ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
                 (
-                    "Check uuid: TEST | Response headers: {'Content-Language': 'en-US',"
-                    " 'Content-Type': 'application/json', 'Server': 'WebLudus.pl',"
-                    " 'X-Render-Origin_Server': 'gunicorn'}"
+                    "Check uuid: TEST | Response headers: {'Content-Language': 'en-US', "
+                    "'Content-Type': 'application/json', 'Server': "
+                    "'https://webludus.pages.dev/', 'X-Render-Origin_Server': 'gunicorn'}"
                 ),
             ),
             (
                 "bepatient.waiter_src.checkers.response_checkers",
                 10,
                 (
-                    "Check uuid: TEST | Dictor path: Server | Dictor search: None"
-                    " | Dictor data: WebLudus.pl"
+                    "Check uuid: TEST | Dictor path: Server | Dictor search: None | Dictor data: "
+                    "https://webludus.pages.dev/"
                 ),
             ),
             (
                 "bepatient.waiter_src.checkers.checker",
                 20,
                 (
-                    "Check uuid: TEST | Condition not met | Checker: HeadersChecker"
-                    " | Comparer: comparer | Dictor_fallback: None"
-                    " | Expected_value: example.com | Ignore_case: False | Path: Server"
-                    " | Search_query: None | Data: WebLudus.pl"
+                    "Check uuid: TEST | Condition not met | Checker: HeadersChecker | Comparer: "
+                    "comparer | Dictor_fallback: None | Expected_value: https://example.com/ | "
+                    "Ignore_case: False | Path: Server | Search_query: None | Data: "
+                    "https://webludus.pages.dev/"
                 ),
             ),
         ]
