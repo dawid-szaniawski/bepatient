@@ -69,7 +69,7 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://webludus.pl/en"
+Homepage = "https://webludus.pages.dev/"
 Source = "https://github.com/dawid-szaniawski/bepatient"
 Documentation = "https://bepatient.webludus.pl/"
 
@@ -100,7 +100,7 @@ line_length = 92
 src_paths = ["bepatient", "test"]
 
 [tool.ruff]
-line-length = 92
+line-length = 112
 target-version = "py313"
 ignore = ["UP034", "UP035", "UP040"]
 
@@ -126,5 +126,6 @@ disable = [
     "missing-module-docstring",
     "missing-class-docstring",
     "missing-function-docstring",
-    "protected-access"
+    "protected-access",
+    "line-too-long"
 ]

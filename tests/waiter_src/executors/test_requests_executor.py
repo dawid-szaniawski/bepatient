@@ -196,13 +196,12 @@ class TestRequestExecutor:
         executor.is_condition_met()
 
         assert executor.error_message() == (
-            "The condition has not been met! | Failed checkers:"
-            " (Checker: StatusCodeChecker | Comparer: is_equal | Expected_value: 404"
-            " | Data: 200) | curl -X GET -H 'Content-Type: application/json'"
-            " -H 'Accept-Language: en-US,en;' -H 'Host: webludus.pl'"
-            " -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101'"
-            " -H 'task: test' -H 'Cookie: pytest=fixture; user-token=abc-123'"
-            " https://webludus.pl/"
+            "The condition has not been met! | Failed checkers: (Checker: "
+            "StatusCodeChecker | Comparer: is_equal | Expected_value: 404 | Data: 200) | "
+            "curl -X GET -H 'Content-Type: application/json' -H 'Accept-Language: "
+            "en-US,en;' -H 'Host: https://webludus.pages.dev/' -H 'User-Agent: "
+            "Mozilla/5.0 (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task: test' -H "
+            "'Cookie: pytest=fixture; user-token=abc-123' https://webludus.pages.dev/"
         )
 
     def test_error_message_returns_correct_message_normal_checker(
@@ -220,12 +219,12 @@ class TestRequestExecutor:
         executor.is_condition_met()
 
         assert executor.error_message() == (
-            "The condition has not been met! | Failed checkers: (Checker: CheckerMocker"
-            " | Comparer: comparer | Expected_value: TEST | Data: Ok)"
-            " | curl -X GET -H 'Content-Type: application/json' -H 'Accept-Language:"
-            " en-US,en;' -H 'Host: webludus.pl' -H 'User-Agent: Mozilla/5.0"
-            " (Windows NT 10.0; rv:120.0) Gecko/20100101' -H 'task: test' -H 'Cookie:"
-            " pytest=fixture; user-token=abc-123' https://webludus.pl/"
+            "The condition has not been met! | Failed checkers: (Checker: CheckerMocker | "
+            "Comparer: comparer | Expected_value: TEST | Data: Ok) | curl -X GET -H "
+            "'Content-Type: application/json' -H 'Accept-Language: en-US,en;' -H 'Host: "
+            "https://webludus.pages.dev/' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; "
+            "rv:120.0) Gecko/20100101' -H 'task: test' -H 'Cookie: pytest=fixture; "
+            "user-token=abc-123' https://webludus.pages.dev/"
         )
 
     def test_error_message_returns_correct_message_multiple_checkers(
@@ -255,7 +254,7 @@ class TestRequestExecutor:
             " CheckerMocker | Comparer: comparer | Expected_value: Hello"
             " | Data: Ok, Checker: CheckerMocker | Comparer: comparer"
             " | Expected_value: TEST | Data: Ok) | curl -X GET -H 'task: test' -H"
-            " 'Cookie: user-token=abc-123' https://webludus.pl/"
+            " 'Cookie: user-token=abc-123' https://webludus.pages.dev/"
         )
 
     def test_error_message_raises_exception_when_condition_has_not_been_checked(
@@ -305,7 +304,7 @@ class TestRequestExecutor:
                 40,
                 (
                     "RequestException! CURL: curl -X GET -H 'task: test' -H 'Cookie: "
-                    "user-token=abc-123' https://webludus.pl/"
+                    "user-token=abc-123' https://webludus.pages.dev/"
                 ),
             )
         ]
@@ -431,7 +430,7 @@ class TestRequestExecutor:
             " | Comparer: comparer | Expected_value: 2 | Data: Ok) | curl -X GET -H"
             " 'task: test' -H 'Cookie: user-token=abc-123' -H 'User-Agent:"
             " python-requests/2.34.2' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
-            " */*' -H 'Connection: keep-alive' https://webludus.pl/"
+            " */*' -H 'Connection: keep-alive' https://webludus.pages.dev/"
         )
 
         executor.conditions_manager.pre_conditions = [checker_true]
@@ -441,7 +440,7 @@ class TestRequestExecutor:
             " | Comparer: comparer | Expected_value: 3 | Data: Ok) | curl -X GET -H"
             " 'task: test' -H 'Cookie: user-token=abc-123' -H 'User-Agent:"
             " python-requests/2.34.2' -H 'Accept-Encoding: gzip, deflate' -H 'Accept:"
-            " */*' -H 'Connection: keep-alive' https://webludus.pl/"
+            " */*' -H 'Connection: keep-alive' https://webludus.pages.dev/"
         )
 
         executor.conditions_manager.main_conditions = [checker_true]

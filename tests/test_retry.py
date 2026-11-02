@@ -60,7 +60,9 @@ class TestRetry:
         @retry(expected=expected, comparer=comparator, delay=0)
         def simple_function() -> int | None:
             try:
-                return requests.get("https://webludus.pl", timeout=1).status_code
+                return requests.get(
+                    "https://webludus.pages.dev/", timeout=1
+                ).status_code
             except AssertionError:
                 return None
 
